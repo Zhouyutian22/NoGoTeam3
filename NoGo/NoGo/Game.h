@@ -23,8 +23,8 @@ public:
 signals:
     //认输，结束游戏
     void EndGame();
-    //展示提醒 1-输赢 2-超时 ...
-    void HintDisplay(int );
+    //展示提醒 1黑棋赢，2白棋赢 3黑超时 4白超时 5黑棋自杀 6黑棋自杀，提醒界面要有再来一局。 //与gamewidget的槽函数对应。
+    void ResultDisplaySignal(QString text);
 
 //信号槽
 public slots:
@@ -41,19 +41,35 @@ public:
     //时间信号
     QTimer* Timer=new QTimer(this);
     //当前棋盘局面**
-    int Board[9][9];
+    int Board[10][10];
     //黑白玩家
     int PlayerBlack;
     int PlayerWhite;
-    //倒计时秒数
-    double TimeLimit;
+    //倒计时时限
+    int TimeLimit;
     //当前一步的开始时间
-    double StartTime;
+    int StartTime;
     //当前的步数
     int StepCount;
+    //当前的落子位置
+    int CurrentPositionX;
+    int CurrentPositionY;
 private:
     //更改下棋方
     void ChangePlayer();
+    //判断是否提子的函数
+    int LibertyCheck(int ,int );
+    //判断是否提子的函数
+    void dfs(int ,int ,int );
+    //判断该点是否在棋盘内
+    bool InBoard(int ,int );
+    //辅助的变量
+    int checked[10][10];
+    //辅助的变量
+    int DirectionX[4];
+    int DirectionY[4];
+    //辅助的变量
+    int flag;
 };
 
 #endif // GAME_H
