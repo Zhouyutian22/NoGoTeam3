@@ -1,7 +1,10 @@
 #include "Game.h"
+#include <QDebug>
 #include <ctime>
 #include <QTimer>
-#include "Resultwidget.h" //结算界面 **
+
+
+//#include "Resultwidget.h" //结算界面 **
 
 /*
     @file Game.cpp
@@ -21,6 +24,8 @@ Game::Game(QObject *parent) : QObject(parent)
     DirectionX[1]=DirectionY[1]=0;
     DirectionX[2]=DirectionY[2]=1;
     DirectionX[3]=DirectionY[3]=0;
+
+
     //检测到Timeout信号时，触发一次judgeTime函数。
     connect(Timer, &QTimer::timeout, this, &Game::judgeTime);
 }
@@ -40,11 +45,11 @@ void Game::ChangePlayer()
     }
 }
 //游戏结束的出口
-void Game::EndGame()
+/*void Game::EndGame()
 {
-    ResultDisplaySignal("??");//Hint类型1是获胜提醒
+    emit ResultDisplaySignal("??");//Hint类型1是获胜提醒
     //还应该实现再来一局 ~w;
-}
+}*/
 
 void Game::setTimeLimit(int Second)
 {
@@ -69,10 +74,13 @@ void Game::judge()
     case 1:
         if(PlayerBlack) emit ResultDisplaySignal("WhiteWin");
         if(PlayerWhite) emit ResultDisplaySignal("BlackWin");
+
         break;
     case 2:
         if(PlayerBlack) emit ResultDisplaySignal("BlackKillself");
         if(PlayerWhite) emit ResultDisplaySignal("WhiteKillself");
+
+        break;
     default:
         break;
     }
@@ -127,6 +135,7 @@ int Game::LibertyCheck(int x,int y)
     {
         return 2;
     }
+    else return 0;
 }
 
 //
