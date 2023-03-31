@@ -20,10 +20,7 @@ Game::Game(QObject *parent) : QObject(parent)
     PlayerBlack=1;
     PlayerWhite=0;
     StepCount=0;
-    DirectionX[0]=DirectionY[0]=-1;
-    DirectionX[1]=DirectionY[1]=0;
-    DirectionX[2]=DirectionY[2]=1;
-    DirectionX[3]=DirectionY[3]=0;
+
 
 
     //检测到Timeout信号时，触发一次judgeTime函数。
@@ -59,6 +56,8 @@ void Game::setTimeLimit(int Second)
 //合法落子后判断输赢
 void Game::judge()
 {
+    Timer->stop();
+    Timer->start(1000);
     int x=CurrentPositionX;
     int y=CurrentPositionY;
 
@@ -70,16 +69,18 @@ void Game::judge()
     case 0:
         ChangePlayer();
         StartTime=clock();
+        //qDebug() << "case 0 emit";
         break;
+
     case 1:
         if(PlayerBlack) emit ResultDisplaySignal("WhiteWin");
         if(PlayerWhite) emit ResultDisplaySignal("BlackWin");
-
+        //qDebug() << "case 1 emit";
         break;
     case 2:
         if(PlayerBlack) emit ResultDisplaySignal("BlackKillself");
         if(PlayerWhite) emit ResultDisplaySignal("WhiteKillself");
-
+        //qDebug() << "case 2 emit";
         break;
     default:
         break;
@@ -94,47 +95,68 @@ int Game::LibertyCheck(int x,int y)
     int flagKillMe=0;
     int MyColor=PlayerBlack?1:-1;
 
-    flag=0;
+
 
     for(int i=0;i<4;i++)
     {
+        flag=0;
         int nx=x+DirectionX[i];
         int ny=y+DirectionY[i];
         //判断(x,y)的四周是否在棋盘内
         if(InBoard(nx,ny))
         {
+            //qDebug() << nx << " " << ny << "checked";
             //重置checked数组和flag来准备做dfs，flag=0表示没有气，即被吃；flag=1表示有气，即没被吃。
             memset(checked,0,sizeof(checked));
 
             //如果该位置为空，则不再继续判断这个位置
             if(Board[nx][ny] == 0) continue;
-            //如果该位置是敌方
+
+            //如果该位置是敌方，判断是否有吃掉敌方
             if(Board[nx][ny] != MyColor)
             {
                 dfs(nx,ny,Board[nx][ny]);
-                flagKillHim=!flag;
+                if(flagKillHim == 0) flagKillHim=!flag;
             }
-            //如果该位置是自方
+            //如果该位置是自方，判断是否有吃掉己方
             if(Board[nx][ny] == MyColor)
             {
                 dfs(nx,ny,Board[nx][ny]);
-                flagKillMe=!flag;
+                if(flagKillMe == 0) flagKillMe=!flag;
             }
         }
     }
+    //单独判断落子位置的气
+    int singlecheck=0;
+    for(int i=0;i<4;i++)
+    {
+        int nx=x+DirectionX[i];
+        int ny=y+DirectionY[i];
+        if(InBoard(nx,ny))
+        {
+            if(Board[nx][ny] != (-1)*MyColor) singlecheck=1;
+        }
+    }
+    if(singlecheck == 0) flagKillMe=1;
     //没有吃棋
     if(flagKillHim == 0 && flagKillMe == 0)
     {
+        //qDebug() << "case 0";
         return 0;
     }
-    if(flagKillHim == 1)
+    //吃对方棋
+    if(flagKillHim == 1 && flagKillMe == 0)
     {
+        //qDebug() << "case 1";
         return 1;
     }
+    //自杀且只自杀
     if(flagKillHim == 0 && flagKillMe == 1)
     {
+        //qDebug() << "case 2";
         return 2;
     }
+
     else return 0;
 }
 
@@ -153,7 +175,7 @@ void Game::dfs(int x,int y,int color)
             //避免重复检查
             if(checked[nx][ny]) continue;
             //如果有敌方棋子，无视
-            if(Board[nx][ny] != color) continue;
+            if(Board[nx][ny] != color && Board[nx][ny] != 0) continue;
             //如果有气,函数通过flag返回TRUE
             if(Board[nx][ny] == 0)
             {
@@ -176,8 +198,10 @@ bool Game::InBoard(int x,int y)
 void Game::judgeTime()
 {
     //超时情况
+    //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     if(clock()-StartTime > TimeLimit*1000)
     {
+        Timer->stop();
         if(PlayerBlack) emit ResultDisplaySignal("BlackOverTime");
         if(PlayerWhite) emit ResultDisplaySignal("WhiteOverTime");
     }

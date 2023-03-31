@@ -23,7 +23,7 @@ public:
 signals:
     //认输，结束游戏
     void EndGame();
-    //展示提醒 1黑棋赢，2白棋赢 3黑超时 4白超时 5黑棋自杀 6黑棋自杀，提醒界面要有再来一局。 //与gamewidget的槽函数对应。
+    //展示提醒 1黑棋赢，2白棋赢 3黑超时 4白超时 5黑棋自杀 6黑棋自杀，提醒界面要有再来一局。
     void ResultDisplaySignal(QString text);
 
 //信号槽
@@ -45,8 +45,8 @@ public:
     //黑白玩家
     int PlayerBlack;
     int PlayerWhite;
-    //倒计时时限
-    int TimeLimit;
+    //倒计时时限 默认为30秒
+    int TimeLimit=30;
     //当前一步的开始时间
     int StartTime;
     //当前的步数
@@ -66,8 +66,8 @@ private:
     //辅助的变量
     int checked[10][10];
     //辅助的变量
-    int DirectionX[4];
-    int DirectionY[4];
+    int DirectionX[4]={0,1,0,-1};
+    int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
 };

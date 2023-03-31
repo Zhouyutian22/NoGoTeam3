@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QMessageBox>
@@ -18,8 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     resize(500,500);        //窗口大小
     current = 1;            //执黑先行
     chesses.clear();        //清空落子记录
-    //连接信号
-    connect(this,&MainWindow::StartJudge,game,&Game::judge);
+
+    connect(this,&MainWindow::StartJudge,game,&Game::judge);          //胜负判断的信号
 }
 void MainWindow::drawboard()
 {
@@ -84,11 +85,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     //当前落子处不能已经有子
     goChess present(point,current);
     chesses.append(present);
+    //向game类传递落子位置
     game->CurrentPositionX=ptx/WIDTH;
     game->CurrentPositionY=pty/HEIGHT;
-    //这里留空，以便可以和棋局类对接，判定胜负以结束棋局
+
     emit StartJudge();
-    //待测试!!
+    //胜负逻辑完成
     current = !current;
 
 
