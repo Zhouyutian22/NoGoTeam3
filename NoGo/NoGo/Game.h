@@ -4,7 +4,7 @@
 #include <QObject>
 #include <vector>
 #include <QTimer>
-
+#include "resultwidget.h"
 /*
     @file Game.h
     @brief  这里定义了Game类，
@@ -35,7 +35,8 @@ public slots:
     //设置时限
     void setTimeLimit(int Second);
     //...
-
+    //游戏结果展示
+    void ResultDisplay(QString text);
 //一些游戏信息
 public:
     //时间信号
@@ -55,6 +56,7 @@ public:
     int CurrentPositionX;
     int CurrentPositionY;
 private:
+
     //更改下棋方
     void ChangePlayer();
     //判断是否提子的函数
@@ -70,6 +72,9 @@ private:
     int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
+    //结果窗口
+    resultwidget* r;
+
 };
 
 #endif // GAME_H

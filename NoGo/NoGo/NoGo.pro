@@ -12,15 +12,18 @@ SOURCES += \
     Game.cpp \
     gochess.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    resultwidget.cpp
 
 HEADERS += \
     Game.h \
     gochess.h \
-    mainwindow.h
+    mainwindow.h \
+    resultwidget.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    resultwidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

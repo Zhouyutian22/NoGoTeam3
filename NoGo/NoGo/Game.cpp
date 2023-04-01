@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "resultwidget.h"
 #include <QDebug>
 #include <ctime>
 #include <QTimer>
@@ -25,6 +26,7 @@ Game::Game(QObject *parent) : QObject(parent)
 
     //检测到Timeout信号时，触发一次judgeTime函数。
     connect(Timer, &QTimer::timeout, this, &Game::judgeTime);
+    connect(this,&Game::ResultDisplaySignal,this,&Game::ResultDisplay);
 }
 
 //切换下棋者：在判断这一步棋不决出胜负之后才切换
@@ -47,6 +49,13 @@ void Game::ChangePlayer()
     emit ResultDisplaySignal("??");//Hint类型1是获胜提醒
     //还应该实现再来一局 ~w;
 }*/
+//展示获胜界面
+void Game::ResultDisplay(QString text)
+{
+    r=new resultwidget(text,nullptr);
+    r->show();
+    delete this;
+}
 
 void Game::setTimeLimit(int Second)
 {
@@ -73,13 +82,13 @@ void Game::judge()
         break;
 
     case 1:
-        if(PlayerBlack) emit ResultDisplaySignal("WhiteWin");
-        if(PlayerWhite) emit ResultDisplaySignal("BlackWin");
+        if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！！！");
+        if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！！！");
         //qDebug() << "case 1 emit";
         break;
     case 2:
-        if(PlayerBlack) emit ResultDisplaySignal("BlackKillself");
-        if(PlayerWhite) emit ResultDisplaySignal("WhiteKillself");
+        if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了……\n白棋方赢啦！！！");
+        if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了……\n黑棋方赢啦！！！");
         //qDebug() << "case 2 emit";
         break;
     default:
@@ -202,8 +211,8 @@ void Game::judgeTime()
     if(clock()-StartTime > TimeLimit*1000)
     {
         Timer->stop();
-        if(PlayerBlack) emit ResultDisplaySignal("BlackOverTime");
-        if(PlayerWhite) emit ResultDisplaySignal("WhiteOverTime");
+        if(PlayerBlack) emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
+        if(PlayerWhite) emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
     }
 
 }

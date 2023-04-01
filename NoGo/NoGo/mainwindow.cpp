@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    resize(500,500);        //窗口大小
+    resize(16.99*WIDTH,10.5*HEIGHT);        //窗口大小
     current = 1;            //执黑先行
     chesses.clear();        //清空落子记录
 
@@ -92,8 +92,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     emit StartJudge();
     //胜负逻辑完成
     current = !current;
-
-
 }
 MainWindow::~MainWindow()
 {
