@@ -4,6 +4,7 @@
 #include <Game.h>
 #include <QMainWindow>
 #include <QVector>
+#include "giveup.h"
 #include "gochess.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,6 +30,9 @@ public:
 
 signals:
     void StartJudge();
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

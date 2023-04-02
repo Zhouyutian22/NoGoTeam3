@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     Game.cpp \
+    giveup.cpp \
     gochess.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -17,11 +18,13 @@ SOURCES += \
 
 HEADERS += \
     Game.h \
+    giveup.h \
     gochess.h \
     mainwindow.h \
     resultwidget.h
 
 FORMS += \
+    giveup.ui \
     mainwindow.ui \
     resultwidget.ui
 

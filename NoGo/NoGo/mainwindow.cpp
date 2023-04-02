@@ -43,7 +43,7 @@ void MainWindow::drawchess()
 {
     QPainter painter(this);
     QPen pencil(Qt::transparent);
-    QBrush brush;
+    //QBrush brush;       可以为棋盘涂上喜欢的底色，暂时无用
     painter.setPen(pencil);
 
     for(int i=0;i<chesses.size();i++)
@@ -104,3 +104,22 @@ void MainWindow::paintEvent(QPaintEvent *)
     drawchess();
     update();
 }
+
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    giveup *give = new giveup;
+    if(current==1)
+    {
+        QString str="白棋胜！";
+        give->on_label_linkActivated(str);
+    }
+    else
+    {
+        QString str="黑棋胜！";
+        give->on_label_linkActivated(str);
+    }
+    give->show();
+}
+
