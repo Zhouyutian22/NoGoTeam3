@@ -25,6 +25,9 @@ signals:
     void EndGame();
     //展示提醒 1黑棋赢，2白棋赢 3黑超时 4白超时 5黑棋自杀 6黑棋自杀，提醒界面要有再来一局。
     void ResultDisplaySignal(QString text);
+    //结果展示的时候停止绘制棋盘
+    void StopGo();
+    void resetGo();
 
 //信号槽
 public slots:
@@ -37,6 +40,8 @@ public slots:
     //...
     //游戏结果展示
     void ResultDisplay(QString text);
+    //重置游戏
+    void resetGame();
 //一些游戏信息
 public:
     //时间信号
@@ -55,6 +60,8 @@ public:
     //当前的落子位置
     int CurrentPositionX;
     int CurrentPositionY;
+    //结果窗口
+    resultwidget* r;
 private:
 
     //更改下棋方
@@ -72,8 +79,7 @@ private:
     int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
-    //结果窗口
-    resultwidget* r;
+
 
 };
 

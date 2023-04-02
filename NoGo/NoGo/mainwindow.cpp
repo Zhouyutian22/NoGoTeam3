@@ -16,11 +16,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/pic/nogo.png"));
+    setWindowTitle("不围棋");
     resize(16.99*WIDTH,10.5*HEIGHT);        //窗口大小
     current = 1;            //执黑先行
+    Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
 
-    connect(this,&MainWindow::StartJudge,game,&Game::judge);          //胜负判断的信号
+    //游戏结束时停止棋盘更新
+    connect(game,&Game::StopGo,this,&MainWindow::StopGoing);
+    //如果分出了胜负，则停止下棋
+    connect(this,&MainWindow::StartJudge,game,&Game::judge);
+    //胜负判断的信号
+    connect(game,&Game::resetGo,this,&MainWindow::setNewGame);
+    //主动认输的信号
+    connect(this,&MainWindow::GiveupSignal,game,&Game::ResultDisplay);
 }
 void MainWindow::drawboard()
 {
@@ -43,7 +53,7 @@ void MainWindow::drawchess()
 {
     QPainter painter(this);
     QPen pencil(Qt::transparent);
-    QBrush brush;
+    //QBrush brush;       可以为棋盘涂上喜欢的底色，暂时无用
     painter.setPen(pencil);
 
     for(int i=0;i<chesses.size();i++)
@@ -63,35 +73,38 @@ void MainWindow::drawchess()
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    QPoint point;
-    int ptx = event->pos().x();
-    int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
-    //要判断是否在棋盘内
-    if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
+    if(Going)
     {
-        point.setX(ptx/WIDTH);
-        point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
-    }
-    else
-    {
-        return ;
-    }
-    for(int i=0;i<chesses.size();i++)
-    {
-        goChess m = chesses[i];
-        if(m.c_point == point)
+        QPoint point;
+        int ptx = event->pos().x();
+        int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
+        //判断点击位置是否在棋盘内
+        if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
+        {
+            point.setX(ptx/WIDTH);
+            point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
+        }
+        else
+        {
             return ;
-    }
-    //当前落子处不能已经有子
-    goChess present(point,current);
-    chesses.append(present);
-    //向game类传递落子位置
-    game->CurrentPositionX=ptx/WIDTH;
-    game->CurrentPositionY=pty/HEIGHT;
+        }
+        for(int i=0;i<chesses.size();i++)
+        {
+            goChess m = chesses[i];
+            if(m.c_point == point)
+                return ;
+        }
+        //当前落子处不能已经有子
+        goChess present(point,current);
+        chesses.append(present);
+        //向game类传递落子位置
+        game->CurrentPositionX=ptx/WIDTH;
+        game->CurrentPositionY=pty/HEIGHT;
+        //启动判断胜负
+        emit StartJudge();
 
-    emit StartJudge();
-    //胜负逻辑完成
-    current = !current;
+        current = !current;
+    }
 }
 MainWindow::~MainWindow()
 {
@@ -100,7 +113,36 @@ MainWindow::~MainWindow()
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
-    drawboard();
-    drawchess();
-    update();
+        drawboard();
+        drawchess();
+        update();
+}
+//停止下棋
+void MainWindow::StopGoing()
+{
+    Going=false;
+}
+
+//重置游戏
+void MainWindow::setNewGame()
+{
+    current = 1;            //执黑先行
+    Going=true;             //正在下棋
+    chesses.clear();        //清空落子记录
+}
+
+//认输按钮触发
+void MainWindow::on_pushButton_clicked()
+{
+    if(Going)
+    {
+        if(current==1)
+        {
+            emit GiveupSignal("黑棋方认输……\n白棋方赢啦！！！");
+        }
+        else
+        {
+            emit GiveupSignal("白棋方认输……\n黑棋方赢啦！！！");
+        }
+    }
 }

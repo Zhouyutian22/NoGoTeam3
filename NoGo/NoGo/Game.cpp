@@ -26,7 +26,9 @@ Game::Game(QObject *parent) : QObject(parent)
 
     //检测到Timeout信号时，触发一次judgeTime函数。
     connect(Timer, &QTimer::timeout, this, &Game::judgeTime);
+    //分出胜负时，展示结果界面
     connect(this,&Game::ResultDisplaySignal,this,&Game::ResultDisplay);
+
 }
 
 //切换下棋者：在判断这一步棋不决出胜负之后才切换
@@ -43,18 +45,27 @@ void Game::ChangePlayer()
         PlayerBlack=1;
     }
 }
-//游戏结束的出口
-/*void Game::EndGame()
+
+void Game::resetGame()
 {
-    emit ResultDisplaySignal("??");//Hint类型1是获胜提醒
-    //还应该实现再来一局 ~w;
-}*/
-//展示获胜界面
+    memset(Board,0,sizeof(Board));
+    PlayerBlack=1;
+    PlayerWhite=0;
+    StepCount=0;
+    emit resetGo();
+}
+
 void Game::ResultDisplay(QString text)
 {
+    //停掉定时器
+    Timer->stop();
+    //弹出获胜信息窗口
     r=new resultwidget(text,nullptr);
+    //设置再来一次的信号与槽
+    connect(r,&resultwidget::StartNewGame,this,&Game::resetGame);
     r->show();
-    delete this;
+    emit StopGo();
+
 }
 
 void Game::setTimeLimit(int Second)

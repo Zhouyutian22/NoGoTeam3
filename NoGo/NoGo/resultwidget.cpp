@@ -6,16 +6,20 @@ resultwidget::resultwidget(QString t,QWidget *parent) :
     ui(new Ui::resultwidget)
 {
     ui->setupUi(this);
+    setWindowTitle("游戏结束~~");
     ui->TextDisplay->setText(t);
-    ui->TextDisplay->setStyleSheet("background-color: ;");
 
+
+    //以下为获胜弹窗的文字格式与背景设定。
+    ui->TextDisplay->setStyleSheet("background-color: lightgray;");
     QTextCursor cursor = ui->TextDisplay->textCursor();
     cursor.select(QTextCursor::Document);
-    cursor.setCharFormat(QTextCharFormat());  // 清除格式
+    //cursor.setCharFormat(QTextCharFormat());  // 清除格式
     QTextCharFormat format;
     format.setForeground(Qt::white);
     format.setFontPointSize(20);
     cursor.setCharFormat(format);
+    connect(ui->NewGame,&QPushButton::clicked,this,&resultwidget::EmitSignal);
 
 }
 
@@ -25,3 +29,7 @@ resultwidget::~resultwidget()
 }
 
 
+void resultwidget::EmitSignal()
+{
+    emit StartNewGame();
+}

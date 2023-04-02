@@ -72,5 +72,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>NewGame</sender>
+   <signal>clicked()</signal>
+   <receiver>resultwidget</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>109</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>128</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>

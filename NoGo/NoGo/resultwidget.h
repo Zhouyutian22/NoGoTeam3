@@ -12,10 +12,14 @@ class resultwidget : public QDialog
 {
     Q_OBJECT
 
+signals:
+    void StartNewGame();   //向Game发出重置游戏的信号
+public slots:
+    void EmitSignal();     //接收本窗口的信号。
 public:
     explicit resultwidget(QString ,QWidget *parent = nullptr);
+
     ~resultwidget();
-    void Display(QString );
 
 private:
     Ui::resultwidget *ui;
