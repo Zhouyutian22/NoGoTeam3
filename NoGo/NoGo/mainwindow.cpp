@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowIcon(QIcon(":/pic/nogo.png"));
     setWindowTitle("不围棋");
     resize(16.99*WIDTH,10.5*HEIGHT);        //窗口大小
     current = 1;            //执黑先行
@@ -31,6 +30,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(game,&Game::resetGo,this,&MainWindow::setNewGame);
     //主动认输的信号
     connect(this,&MainWindow::GiveupSignal,game,&Game::ResultDisplay);
+    //修改时限的信号
+    connect(ui->setTimeButton,&QPushButton::clicked,this,&MainWindow::setTimeLimit);
+}
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 void MainWindow::drawboard()
 {
@@ -68,9 +73,16 @@ void MainWindow::drawchess()
         painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
         //画棋子
 
+        //在认输框右侧显示现在的落子方
+        if(now.w_color == 1)
+            painter.setBrush(Qt::white);
+        else
+            painter.setBrush(Qt::black);
+        QPoint HintPlayer(14.5*WIDTH,1.85*HEIGHT);
+        painter.drawEllipse(HintPlayer,WIDTH/2,HEIGHT/2);
     }
 }
-
+//鼠标点击落子
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if(Going)
@@ -106,31 +118,25 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         current = !current;
     }
 }
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
+//绘制棋盘和棋子的动作
 void MainWindow::paintEvent(QPaintEvent *)
 {
         drawboard();
         drawchess();
         update();
 }
-//停止下棋
+//停止下棋，使得绘制棋子、逻辑判断停止
 void MainWindow::StopGoing()
 {
     Going=false;
 }
-
-//重置游戏
+//再来一局
 void MainWindow::setNewGame()
 {
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
 }
-
 //认输按钮触发
 void MainWindow::on_pushButton_clicked()
 {
@@ -144,5 +150,21 @@ void MainWindow::on_pushButton_clicked()
         {
             emit GiveupSignal("白棋方认输……\n黑棋方赢啦！！！");
         }
+    }
+}
+//修改时限
+void MainWindow::setTimeLimit()
+{
+    QString TimeFigure=ui->setTimeLimit->toPlainText();
+    bool Legal;
+    int TimeLimit=TimeFigure.toInt(&Legal);
+    if(Legal)
+    {
+        game->setTimeLimit(TimeLimit);
+    }
+    else
+    {
+        ui->setTimeLimit->clear();
+        ui->setTimeLimit->append("输入无效");
     }
 }

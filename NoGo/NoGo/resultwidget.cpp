@@ -14,7 +14,7 @@ resultwidget::resultwidget(QString t,QWidget *parent) :
     ui->TextDisplay->setStyleSheet("background-color: lightgray;");
     QTextCursor cursor = ui->TextDisplay->textCursor();
     cursor.select(QTextCursor::Document);
-    //cursor.setCharFormat(QTextCharFormat());  // 清除格式
+
     QTextCharFormat format;
     format.setForeground(Qt::white);
     format.setFontPointSize(20);

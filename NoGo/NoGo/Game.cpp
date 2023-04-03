@@ -45,7 +45,7 @@ void Game::ChangePlayer()
         PlayerBlack=1;
     }
 }
-
+//再来一局
 void Game::resetGame()
 {
     memset(Board,0,sizeof(Board));
@@ -54,7 +54,7 @@ void Game::resetGame()
     StepCount=0;
     emit resetGo();
 }
-
+//弹出结果窗口
 void Game::ResultDisplay(QString text)
 {
     //停掉定时器
@@ -67,12 +67,11 @@ void Game::ResultDisplay(QString text)
     emit StopGo();
 
 }
-
+//设置时限
 void Game::setTimeLimit(int Second)
 {
     TimeLimit=Second;
 }
-
 //合法落子后判断输赢
 void Game::judge()
 {
@@ -107,7 +106,7 @@ void Game::judge()
     }
 
 }
-//辅助函数来判断是否围住了邻近对手棋子的气。
+//judge函数的辅助函数来判断是否围住了邻近对手棋子的气。
 int Game::LibertyCheck(int x,int y)
 {
     //0表示没有出事，1表示出事
@@ -179,8 +178,7 @@ int Game::LibertyCheck(int x,int y)
 
     else return 0;
 }
-
-//
+//judge函数的辅助函数
 void Game::dfs(int x,int y,int color)
 {
     //避免重复检查
@@ -214,7 +212,7 @@ bool Game::InBoard(int x,int y)
 {
     return (x>=1 && x<=9 && y>=1 && y<=9);
 }
-
+//判断是否超时
 void Game::judgeTime()
 {
     //超时情况

@@ -31,6 +31,7 @@ public:
     void setNewGame();            //再来一局的初始化
 public slots:
     void StopGoing();
+    void setTimeLimit();
 signals:
     void StartJudge();
     //主动认输
