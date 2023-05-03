@@ -24,19 +24,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     //游戏结束时停止棋盘更新
     connect(game,&Game::StopGo,this,&MainWindow::StopGoing);
-    //如果分出了胜负，则停止下棋
-    connect(this,&MainWindow::StartJudge,game,&Game::judge);
+    //退出游戏的信号
+    connect(game,&Game::exitGo,this,&MainWindow::close);
     //胜负判断的信号
+    connect(this,&MainWindow::StartJudge,game,&Game::judge);
+    //重置游戏的信号
     connect(game,&Game::resetGo,this,&MainWindow::setNewGame);
     //主动认输的信号
     connect(this,&MainWindow::GiveupSignal,game,&Game::ResultDisplay);
     //修改时限的信号
     connect(ui->setTimeButton,&QPushButton::clicked,this,&MainWindow::setTimeLimit);
+    //更新时间展示的信号
+    connect(game,&Game::updateTime,this,&MainWindow::DisplayTime);
 }
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+//画棋盘
 void MainWindow::drawboard()
 {
     QPainter painter(this);     //调用绘画工具
@@ -53,7 +58,7 @@ void MainWindow::drawboard()
     }
     //画棋盘使用drawRect方法
 }
-
+//画棋子
 void MainWindow::drawchess()
 {
     QPainter painter(this);
@@ -70,7 +75,11 @@ void MainWindow::drawchess()
             painter.setBrush(Qt::white);
 
         QPoint center((now.c_point.x()+0.5)*WIDTH,(now.c_point.y()+0.5)*HEIGHT);
-        painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
+        //高亮最近一步
+        if(i != chesses.size() -1 )
+            painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
+        else
+            painter.drawEllipse(center,WIDTH*2/3,HEIGHT*2/3);
         //画棋子
 
         //在认输框右侧显示现在的落子方
@@ -85,7 +94,7 @@ void MainWindow::drawchess()
 //鼠标点击落子
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if(Going)
+    if(Going) //如果棋局在进行
     {
         QPoint point;
         int ptx = event->pos().x();
@@ -123,6 +132,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 {
         drawboard();
         drawchess();
+        drawHint();
         update();
 }
 //停止下棋，使得绘制棋子、逻辑判断停止
@@ -136,6 +146,7 @@ void MainWindow::setNewGame()
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
+    ui->TimeDisplay->clear();
 }
 //认输按钮触发
 void MainWindow::on_pushButton_clicked()
@@ -152,13 +163,22 @@ void MainWindow::on_pushButton_clicked()
         }
     }
 }
+//更新倒计时
+void MainWindow::DisplayTime(int Time)
+{
+    if(Time>=0)
+    {
+        QString TimeString=QString::number(Time,10);
+        ui->TimeDisplay->setText(TimeString+"s");
+    }
+}
 //修改时限
 void MainWindow::setTimeLimit()
 {
     QString TimeFigure=ui->setTimeLimit->toPlainText();
     bool Legal;
     int TimeLimit=TimeFigure.toInt(&Legal);
-    if(Legal)
+    if(Legal && TimeLimit > 0)
     {
         game->setTimeLimit(TimeLimit);
     }
@@ -167,4 +187,22 @@ void MainWindow::setTimeLimit()
         ui->setTimeLimit->clear();
         ui->setTimeLimit->append("输入无效");
     }
+}
+
+//禁止落子提示
+void MainWindow::drawHint()
+{
+    QPainter painter(this);
+    QPen pencil(Qt::transparent);
+    painter.setPen(pencil);
+    painter.setBrush(Qt::red);
+    for(int i=1;i<10;i++)
+        for(int j=1;j<10;j++)
+        {
+            if(game->helper[i][j] == 1)
+            {
+                QPoint center((i+0.5)*WIDTH,(j+0.5)*HEIGHT);
+                painter.drawEllipse(center,WIDTH/4,HEIGHT/4);
+            }
+        }
 }

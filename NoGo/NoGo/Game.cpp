@@ -5,7 +5,7 @@
 #include <QTimer>
 
 
-//#include "Resultwidget.h" //结算界面 **
+
 
 /*
     @file Game.cpp
@@ -31,7 +31,7 @@ Game::Game(QObject *parent) : QObject(parent)
 
 }
 
-//切换下棋者：在判断这一步棋不决出胜负之后才切换
+//切换下棋者
 void Game::ChangePlayer()
 {
     if(PlayerBlack == 1)
@@ -54,6 +54,11 @@ void Game::resetGame()
     StepCount=0;
     emit resetGo();
 }
+//退出游戏
+void Game::exitGame()
+{
+    emit exitGo();
+}
 //弹出结果窗口
 void Game::ResultDisplay(QString text)
 {
@@ -63,6 +68,8 @@ void Game::ResultDisplay(QString text)
     r=new resultwidget(text,nullptr);
     //设置再来一次的信号与槽
     connect(r,&resultwidget::StartNewGame,this,&Game::resetGame);
+    //设置退出游戏的信号与槽
+    connect(r,&resultwidget::ExitGame,this,&Game::exitGame);
     r->show();
     emit StopGo();
 
@@ -75,8 +82,9 @@ void Game::setTimeLimit(int Second)
 //合法落子后判断输赢
 void Game::judge()
 {
+    StepCount++;
     Timer->stop();
-    Timer->start(1000);
+    Timer->start(200);
     int x=CurrentPositionX;
     int y=CurrentPositionY;
 
@@ -89,6 +97,7 @@ void Game::judge()
         ChangePlayer();
         StartTime=clock();
         //qDebug() << "case 0 emit";
+        Assistant();
         break;
 
     case 1:
@@ -104,6 +113,8 @@ void Game::judge()
     default:
         break;
     }
+
+
 
 }
 //judge函数的辅助函数来判断是否围住了邻近对手棋子的气。
@@ -217,6 +228,7 @@ void Game::judgeTime()
 {
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
+    emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
     if(clock()-StartTime > TimeLimit*1000)
     {
         Timer->stop();
@@ -225,3 +237,25 @@ void Game::judgeTime()
     }
 
 }
+//可落子判断
+void Game::Assistant()
+{
+    memset(helper,0,sizeof(helper));
+    for(int i=1;i<10;i++)
+        for(int j=1;j<10;j++)
+        {
+            if(Board[i][j] == 0)
+            {
+                Board[i][j]=PlayerBlack?1:-1;
+                if(LibertyCheck(i,j)) helper[i][j]=1;
+                Board[i][j]=0;
+            }
+        }
+    qDebug() << StepCount;
+    for(int i=1;i<10;i++)
+    {
+        qDebug() << helper[i][1] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][5] << " " << helper[i][6] << " " << helper[i][7] << " " << helper[i][8] << " " << helper[i][9];
+    }
+    qDebug() <<"----------------------";
+}
+

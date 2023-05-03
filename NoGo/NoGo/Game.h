@@ -28,7 +28,8 @@ signals:
     //结果展示的时候停止绘制棋盘
     void StopGo();
     void resetGo();
-
+    void exitGo();
+    void updateTime(int );
 //信号槽
 public slots:
     //判断游戏胜负
@@ -42,6 +43,8 @@ public slots:
     void ResultDisplay(QString text);
     //重置游戏
     void resetGame();
+    //退出游戏
+    void exitGame();
 //一些游戏信息
 public:
     //时间信号
@@ -62,6 +65,10 @@ public:
     int CurrentPositionY;
     //结果窗口
     resultwidget* r;
+    //不可下棋处的探测
+    void Assistant();
+    //不可下棋处
+    int helper[10][10];
 private:
 
     //更改下棋方
@@ -72,6 +79,8 @@ private:
     void dfs(int ,int ,int );
     //判断该点是否在棋盘内
     bool InBoard(int ,int );
+    //判断该点四周是否有子
+    bool NeedCheck(int ,int );
     //辅助的变量
     int checked[10][10];
     //辅助的变量

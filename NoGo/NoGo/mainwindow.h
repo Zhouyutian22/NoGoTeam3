@@ -25,6 +25,7 @@ public:
     void paintEvent(QPaintEvent *event);    //绘画工具
     void drawboard(void);        //绘制棋盘函数
     void drawchess(void);       //绘制棋子函数
+    void drawHint(void);            //绘制提示符
     void mousePressEvent (QMouseEvent *event);      //鼠标点击事件：落子
     QVector<goChess>chesses;    //      动态数组记录落子
     bool current;                   //当前落子颜色
@@ -32,6 +33,8 @@ public:
 public slots:
     void StopGoing();
     void setTimeLimit();
+    void DisplayTime(int );
+
 signals:
     void StartJudge();
     //主动认输

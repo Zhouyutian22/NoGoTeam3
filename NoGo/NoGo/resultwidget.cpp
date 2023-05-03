@@ -20,7 +20,7 @@ resultwidget::resultwidget(QString t,QWidget *parent) :
     format.setFontPointSize(20);
     cursor.setCharFormat(format);
     connect(ui->NewGame,&QPushButton::clicked,this,&resultwidget::EmitSignal);
-
+    connect(ui->Exit,&QPushButton::clicked,this,&resultwidget::Exit);
 }
 
 resultwidget::~resultwidget()
@@ -32,4 +32,9 @@ resultwidget::~resultwidget()
 void resultwidget::EmitSignal()
 {
     emit StartNewGame();
+}
+
+void resultwidget::Exit()
+{
+    emit ExitGame();
 }
