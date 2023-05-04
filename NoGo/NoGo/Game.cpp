@@ -135,6 +135,7 @@ int Game::LibertyCheck(int x,int y)
         //判断(x,y)的四周是否在棋盘内
         if(InBoard(nx,ny))
         {
+
             //qDebug() << nx << " " << ny << "checked";
             //重置checked数组和flag来准备做dfs，flag=0表示没有气，即被吃；flag=1表示有气，即没被吃。
             memset(checked,0,sizeof(checked));
@@ -174,8 +175,8 @@ int Game::LibertyCheck(int x,int y)
         //qDebug() << "case 0";
         return 0;
     }
-    //吃对方棋
-    if(flagKillHim == 1 && flagKillMe == 0)
+    //吃对方棋，无论是否自杀
+    if(flagKillHim == 1)
     {
         //qDebug() << "case 1";
         return 1;

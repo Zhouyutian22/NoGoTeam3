@@ -75,11 +75,11 @@ void MainWindow::drawchess()
             painter.setBrush(Qt::white);
 
         QPoint center((now.c_point.x()+0.5)*WIDTH,(now.c_point.y()+0.5)*HEIGHT);
-        //高亮最近一步
-        if(i != chesses.size() -1 )
+        //高亮最近二步
+        if(i < chesses.size() -2 )
             painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
         else
-            painter.drawEllipse(center,WIDTH*2/3,HEIGHT*2/3);
+            painter.drawEllipse(center,WIDTH*3/5,HEIGHT*3/5);
         //画棋子
 
         //在认输框右侧显示现在的落子方
