@@ -17,7 +17,7 @@ resultwidget::resultwidget(QString t,QWidget *parent) :
 
     QTextCharFormat format;
     format.setForeground(Qt::white);
-    format.setFontPointSize(20);
+    format.setFontPointSize(15);
     cursor.setCharFormat(format);
     connect(ui->NewGame,&QPushButton::clicked,this,&resultwidget::EmitSignal);
     connect(ui->Exit,&QPushButton::clicked,this,&resultwidget::Exit);

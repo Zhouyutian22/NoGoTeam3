@@ -1,4 +1,5 @@
-QT       += core gui
+QT       += core gui \
+    quick
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,6 +15,9 @@ SOURCES += \
     gochess.cpp \
     main.cpp \
     mainwindow.cpp \
+    networkdata.cpp \
+    networkserver.cpp \
+    networksocket.cpp \
     resultwidget.cpp
 
 HEADERS += \
@@ -21,6 +25,9 @@ HEADERS += \
     giveup.h \
     gochess.h \
     mainwindow.h \
+    networkdata.h \
+    networkserver.h \
+    networksocket.h \
     resultwidget.h
 
 FORMS += \
@@ -39,3 +46,5 @@ DISTFILES += \
 RESOURCES +=
 
 RC_ICONS = img/logo.ico
+
+QT += network

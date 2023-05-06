@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
-
+    DisplayTime(game->TimeLimit);
     //游戏结束时停止棋盘更新
     connect(game,&Game::StopGo,this,&MainWindow::StopGoing);
     //退出游戏的信号
@@ -87,8 +87,12 @@ void MainWindow::drawchess()
             painter.setBrush(Qt::white);
         else
             painter.setBrush(Qt::black);
+
         QPoint HintPlayer(14.5*WIDTH,1.85*HEIGHT);
         painter.drawEllipse(HintPlayer,WIDTH/2,HEIGHT/2);
+
+        //显示步数
+        ui->StepDisplay->display(game->StepCount);
     }
 }
 //鼠标点击落子
@@ -125,6 +129,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         emit StartJudge();
 
         current = !current;
+
     }
 }
 //绘制棋盘和棋子的动作
@@ -146,7 +151,10 @@ void MainWindow::setNewGame()
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
-    ui->TimeDisplay->clear();
+    DisplayTime(game->TimeLimit);
+    ui->StepDisplay->display(0);
+    game->Assistant();
+
 }
 //认输按钮触发
 void MainWindow::on_pushButton_clicked()
@@ -155,11 +163,11 @@ void MainWindow::on_pushButton_clicked()
     {
         if(current==1)
         {
-            emit GiveupSignal("黑棋方认输……\n白棋方赢啦！！！");
+            emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
         }
         else
         {
-            emit GiveupSignal("白棋方认输……\n黑棋方赢啦！！！");
+            emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
         }
     }
 }
@@ -168,8 +176,15 @@ void MainWindow::DisplayTime(int Time)
 {
     if(Time>=0)
     {
-        QString TimeString=QString::number(Time,10);
-        ui->TimeDisplay->setText(TimeString+"s");
+        int minute=Time/60;
+        QString Min=QString::number(minute,10);
+
+        Time%=60;
+        QString Second=QString::number(Time,10);
+        if(Time < 10) Second="0" + Second;
+        if(minute != 0 && minute >=10 ) ui->TimeDisplay->display(Min + ":" + Second);
+        else if(minute == 0) ui->TimeDisplay->display("00:" + Second);
+        else if(minute < 10) ui->TimeDisplay->display("0"+Min+":"+Second);
     }
 }
 //修改时限
@@ -180,6 +195,7 @@ void MainWindow::setTimeLimit()
     int TimeLimit=TimeFigure.toInt(&Legal);
     if(Legal && TimeLimit > 0)
     {
+        if(game->StepCount == 0) DisplayTime(TimeLimit);
         game->setTimeLimit(TimeLimit);
     }
     else
@@ -187,6 +203,7 @@ void MainWindow::setTimeLimit()
         ui->setTimeLimit->clear();
         ui->setTimeLimit->append("输入无效");
     }
+
 }
 
 //禁止落子提示

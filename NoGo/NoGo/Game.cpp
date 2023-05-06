@@ -83,6 +83,7 @@ void Game::setTimeLimit(int Second)
 void Game::judge()
 {
     StepCount++;
+    QString step=QString::number(StepCount,10);
     Timer->stop();
     Timer->start(200);
     int x=CurrentPositionX;
@@ -101,13 +102,13 @@ void Game::judge()
         break;
 
     case 1:
-        if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！！！");
-        if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！！！");
+        if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
+        if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
         //qDebug() << "case 1 emit";
         break;
     case 2:
-        if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了……\n白棋方赢啦！！！");
-        if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了……\n黑棋方赢啦！！！");
+        if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了。  步数：" + step + "\n白棋方赢啦！");
+        if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
         //qDebug() << "case 2 emit";
         break;
     default:
