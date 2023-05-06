@@ -69,6 +69,10 @@ public:
     void Assistant();
     //不可下棋处
     int helper[10][10];
+    //判断窗口是否被关闭
+    bool closed;
+    //游戏总时长
+    int TotalTime;
 private:
 
     //更改下棋方
