@@ -135,7 +135,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
    <widget class="QMenu" name="menuNoGo">
     <property name="title">
-     <string>NoGo !</string>
+     <string>NoGo!</string>
     </property>
    </widget>
    <addaction name="menuNoGo"/>

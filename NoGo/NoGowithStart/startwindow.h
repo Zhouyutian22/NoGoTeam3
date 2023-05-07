@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QVector>
 #include "mainwindow.h"
+#include "netwindow.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class StartWindow; }
 QT_END_NAMESPACE
@@ -16,10 +18,13 @@ signals:
 
 public slots:
     void SingleGame();
+    void NetGame();
 public:
 
     StartWindow(QWidget *parent = nullptr);
     ~StartWindow();
+
+
 
 private:
     Ui::StartWindow *ui;

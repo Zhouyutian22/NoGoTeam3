@@ -13,6 +13,10 @@ SOURCES += \
     gochess.cpp \
     main.cpp \
     mainwindow.cpp \
+    netwindow.cpp \
+    networkdata.cpp \
+    networkserver.cpp \
+    networksocket.cpp \
     resultwidget.cpp \
     startwindow.cpp
 
@@ -20,11 +24,16 @@ HEADERS += \
     Game.h \
     gochess.h \
     mainwindow.h \
+    netwindow.h \
+    networkdata.h \
+    networkserver.h \
+    networksocket.h \
     resultwidget.h \
     startwindow.h
 
 FORMS += \
     mainwindow.ui \
+    netwindow.ui \
     resultwidget.ui \
     startwindow.ui
 
