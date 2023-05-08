@@ -1,0 +1,70 @@
+Game at 00:52:51 中国标准时间
+1: Playerblack D2
+2: Playerwhite C4
+3: Playerblack D3
+4: Playerwhite D4
+5: Playerblack C3
+game is over
+The result is below:
+Total time: 0 Total steps: 5
+Winner: Playerbalck G
+Game at 00:53:31 中国标准时间
+1: Playerblack D3
+2: Playerwhite D4
+3: Playerblack C4
+4: Playerwhite D5
+5: Playerblack F7
+6: Playerwhite E7
+7: Playerblack C5
+8: Playerwhite G6
+9: Playerblack D6
+10: Playerwhite F6
+11: Playerblack E6
+12: Playerwhite G8
+13: Playerblack E5
+14: Playerwhite H4
+15: Playerblack E4
+game is over
+The result is below:
+Total time: 0 Total steps: 15
+Winner: Playerwhite
+game is over
+The result is below:
+Total time: 0 Total steps: 15
+Winner: Playerwhite
+1: Playerblack C4
+2: Playerwhite C5
+3: Playerblack D5
+4: Playerwhite F4
+5: Playerblack B5
+6: Playerwhite C6
+7: Playerblack D6
+8: Playerwhite F6
+9: Playerblack C7
+10: Playerwhite A7
+11: Playerblack B6
+game is over
+The result is below:
+Total time: 0 Total steps: 11
+Winner: Playerwhite
+Game at 00:58:51 中国标准时间
+1: Playerblack D5
+2: Playerwhite E6
+3: Playerblack E5
+4: Playerwhite G3
+5: Playerblack F5
+game is over
+The result is below:
+Total time: 0 Total steps: 5
+Winner: Playerblack T
+Game at 01:00:42 中国标准时间
+1: Playerblack E3
+2: Playerwhite H4
+3: Playerblack G4
+4: Playerwhite H3
+5: Playerblack I4
+6: Playerwhite G5
+game is over
+The result is below:
+Total time: 0 Total steps: 6
+Winner: Playerwhite G
