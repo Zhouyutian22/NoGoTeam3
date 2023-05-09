@@ -10,7 +10,7 @@
     @time: 2023.03.21
 */
 
-Game::Game(QObject *parent) : QObject(parent),f("C:\\Users\\lyyus\\Desktop\\m\\NoGoTeam3\\NoGo\\NoGowithStart\\pregames.txt")
+Game::Game(QObject *parent) : QObject(parent),f("localgames.txt")
 {
     //初始化游戏
     memset(Board,0,sizeof(Board));
@@ -43,7 +43,7 @@ void Game::ChangePlayer()
 //再来一局
 void Game::resetGame()
 {
-    game_over();
+    game_init();
     memset(Board,0,sizeof(Board));
     memset(helper,0,sizeof(helper));
     PlayerBlack=1;
@@ -307,7 +307,7 @@ void Game::game_init(void)
     QTextStream out(&f);
     QString str = "Game at ";
     QTime time = QTime::currentTime();
-
+    out<<'-'<<'\n';
     out<<str<<time.toString("hh:mm:ss t")<<'\n';
 
     f.close();
