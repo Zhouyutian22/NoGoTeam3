@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
+                                                                                        NetMode=0;              //默认为单机游戏
     DisplayTime(game->TimeLimit);
     //游戏结束时停止棋盘更新
     connect(game,&Game::StopGo,this,&MainWindow::StopGoing);
@@ -98,7 +99,7 @@ void MainWindow::drawchess()
 //鼠标点击落子
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if(Going) //如果棋局在进行
+    if(Going && !NetMode) //如果棋局在进行
     {
         QPoint point;
         int ptx = event->pos().x();
@@ -131,6 +132,52 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         current = !current;
 
     }
+                                                            else if(NetMode) //复制过来的
+                                                            {
+                                                                    qDebug() << "pressevent" << " 1 ";
+                                                                if((MyColor == 1 && current == 1) || (MyColor == -1 && current == 0))
+                                                                {
+                                                                    qDebug() << "pressevent" << " 2 ";
+                                                                        QPoint point;
+                                                                        int ptx = event->pos().x();
+                                                                        int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
+                                                                        //判断点击位置是否在棋盘内
+                                                                        if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
+                                                                        {
+                                                                            point.setX(ptx/WIDTH);
+                                                                            point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return ;
+                                                                        }
+                                                                        for(int i=0;i<chesses.size();i++)
+                                                                        {
+                                                                            goChess m = chesses[i];
+                                                                            if(m.c_point == point)
+                                                                                return ;
+                                                                        }
+                                                                        qDebug() << "pressevent" << " 3 ";
+                                                                        //当前落子处不能已经有子
+                                                                        goChess present(point,current);
+                                                                        chesses.append(present);
+
+                                                                        //向game类传递落子位置
+                                                                        game->CurrentPositionX=ptx/WIDTH;
+                                                                        game->CurrentPositionY=pty/HEIGHT;
+                                                                        qDebug() << "pressevent" << " 4 ";
+                                                                        //向对手传递落子位置
+                                                                        emit Move(game->CurrentPositionX,game->CurrentPositionY);
+                                                                        //启动判断胜负
+                                                                        qDebug() << "pressevent" << " 5 ";
+                                                                        drawchess();
+
+                                                                        emit StartJudge();
+                                                                        qDebug() << "pressevent" << " 6 ";
+                                                                        DisplayTime(game->TimeLimit);
+                                                                        current = !current;
+                                                                }
+                                                            }
 }
 //绘制棋盘和棋子的动作
 void MainWindow::paintEvent(QPaintEvent *)
@@ -159,22 +206,30 @@ void MainWindow::setNewGame()
 //认输按钮触发
 void MainWindow::on_pushButton_clicked()
 {
-    if(game->StepCount == 0)
+    if(!NetMode)
     {
-        QMessageBox::critical(this, "提示", "游戏还没有开始~");
-        return;
-    }
-    if(Going)
-    {
-        if(current==1)
+        if(game->StepCount == 0)
         {
-            emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
+            QMessageBox::critical(this, "提示", "游戏还没有开始~");
+            return;
         }
-        else
+        if(Going)
         {
-            emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
+            if(current==1)
+            {
+                emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
+            }
+            else
+            {
+                emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
+            }
         }
     }
+
+                                                                                                        if(NetMode)
+                                                                                                        {
+                                                                                                            emit GiveUp();
+                                                                                                        }
 }
 //更新倒计时
 void MainWindow::DisplayTime(int Time)
@@ -241,7 +296,36 @@ void MainWindow::drawHint()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    emit ReturnStart();
-    game->closed=true;
-    delete this;
+    if(!NetMode)
+    {
+        emit ReturnStart();
+        game->closed=true;
+        delete this;
+    }
+    else if(NetMode)
+    {
+
+    }
 }
+
+                                                                                    void MainWindow::PutChessOn(int x,int y)
+                                                                                    {
+                                                                                        qDebug() << "putchess" << " 1 ";
+                                                                                        QPoint point;
+                                                                                        point.setX(x);
+                                                                                        point.setY(y);
+                                                                                        qDebug() << "putchess" << " 2 ";
+
+                                                                                        goChess present(point,current);
+                                                                                        chesses.append(present);
+                                                                                        //向game类传递落子位置
+                                                                                        game->CurrentPositionX=x;
+                                                                                        game->CurrentPositionY=y;
+                                                                                        //启动判断胜负
+                                                                                        qDebug() << "putchess" << " 3 ";
+                                                                                        emit StartJudge();
+                                                                                        qDebug() << "判断完毕，位置：" << x << " " << y;
+                                                                                        DisplayTime(game->TimeLimit);
+                                                                                        current = !current;
+                                                                                        qDebug() << "putchess" << " 4 ";
+                                                                                    }

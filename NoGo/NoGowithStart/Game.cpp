@@ -22,7 +22,7 @@ Game::Game(QObject *parent) : QObject(parent)
     PlayerBlack=1;
     PlayerWhite=0;
     StepCount=0;
-
+                                                                                                online=0;
 
 
     //检测到Timeout信号时，触发一次judgeTime函数。
@@ -90,33 +90,48 @@ void Game::judge()
     Timer->start(200);
     int x=CurrentPositionX;
     int y=CurrentPositionY;
-
+    qDebug() << "judge" << " 1 ";
     if(PlayerBlack) Board[x][y] = 1;
     if(PlayerWhite) Board[x][y] =-1;
-
+    qDebug() << "judge" << " 2 ";
     //0表示游戏继续，1表示落棋方吃子而输，2表示落棋方自杀而输
-    switch (LibertyCheck(x,y)) {
-    case 0:
-        ChangePlayer();
-        StartTime=clock();
-        //qDebug() << "case 0 emit";
-        Assistant();
-        break;
+    if(!online) switch (LibertyCheck(x,y)) {
+        case 0:
+            ChangePlayer();
+            StartTime=clock();
+            //qDebug() << "case 0 emit";
+            Assistant();
+            break;
 
-    case 1:
-        if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
-        if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
-        //qDebug() << "case 1 emit";
-        break;
-    case 2:
-        if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了。  步数：" + step + "\n白棋方赢啦！");
-        if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
-        //qDebug() << "case 2 emit";
-        break;
-    default:
-        break;
-    }
+        case 1:
+            if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
+            if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
+            //qDebug() << "case 1 emit";
+            break;
+        case 2:
+            if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了。  步数：" + step + "\n白棋方赢啦！");
+            if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
+            //qDebug() << "case 2 emit";
+            break;
+        default:
+            break;
+        }
 
+
+                                                                                                                if(online) switch (LibertyCheck(x,y)) {
+                                                                                                                case 0:
+                                                                                                                    qDebug() << "judge" << " 3 ";
+                                                                                                                    ChangePlayer();
+                                                                                                                    StartTime=clock();
+
+                                                                                                                    Assistant();
+                                                                                                                    qDebug() << "judge" << " 4 ";
+                                                                                                                    break;
+                                                                                                                default:
+                                                                                                                    if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
+                                                                                                                    emit Suicide();
+                                                                                                                    break;
+                                                                                                                }
 
 
 }
@@ -235,7 +250,7 @@ void Game::judgeTime()
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
-    if(clock()-StartTime > TimeLimit*1000)
+    if(!online && clock()-StartTime > TimeLimit*1000)
     {
         Timer->stop();
         if(PlayerBlack) emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");

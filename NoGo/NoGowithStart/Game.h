@@ -30,6 +30,8 @@ signals:
     void resetGo();
     void exitGo();
     void updateTime(int );
+                                                                                         void Suicide(); //自杀信号
+
 //信号槽
 public slots:
     //判断游戏胜负
@@ -73,6 +75,9 @@ public:
     bool closed;
     //游戏总时长
     int TotalTime;
+
+                                                                        bool online;
+                                                                        int MyColor;
 private:
 
     //更改下棋方
