@@ -5,10 +5,6 @@
 #include <vector>
 #include <QTimer>
 #include "resultwidget.h"
-#include <QFile>
-#include <QDebug>
-#include <QString>
-#include <QTime>
 /*
     @file Game.h
     @brief  这里定义了Game类，
@@ -23,6 +19,7 @@ class Game : public QObject
 public:
     //构造函数
     explicit Game(QObject *parent = nullptr);
+
 signals:
     //认输，结束游戏
     void EndGame();
@@ -33,6 +30,8 @@ signals:
     void resetGo();
     void exitGo();
     void updateTime(int );
+                                                                                         void Suicide(); //自杀信号
+
 //信号槽
 public slots:
     //判断游戏胜负
@@ -76,33 +75,17 @@ public:
     bool closed;
     //游戏总时长
     int TotalTime;
-    /*
-     *  游戏胜者
-     *  0 白方正常赢
-     *  1 黑方正常赢
-     *  2 白方认输，黑方赢
-     *  3 黑方认输，白方赢
-     *  4 白方自杀，黑方赢
-     *  5 黑方自杀，白方赢
-     *  6 白方超时，黑方赢
-     *  7 黑方超时，白方赢
-     */
-    int winner;
-    //行棋中记录
-    void go_write(bool,int,int,int);
-    //对局开始时记录
-    void game_init(void);
-    //对局结束时记录
-    void game_over(void);
+
+                                                                        bool online;
+                                                                        int MyColor;
 private:
-    //储存对局棋谱和简要信息
-    QFile f;
+
     //更改下棋方
     void ChangePlayer();
     //判断是否提子的函数
-    void dfs(int ,int ,int );
-    //判断是否提子的函数
     int LibertyCheck(int ,int );
+    //判断是否提子的函数
+    void dfs(int ,int ,int );
     //判断该点是否在棋盘内
     bool InBoard(int ,int );
     //判断该点四周是否有子
@@ -114,6 +97,8 @@ private:
     int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
+
+
 };
 
 #endif // GAME_H

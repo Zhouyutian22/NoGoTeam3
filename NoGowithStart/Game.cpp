@@ -3,6 +3,10 @@
 #include <QDebug>
 #include <ctime>
 #include <QTimer>
+
+
+
+
 /*
     @file Game.cpp
     @brief  这里定义了Game类，
@@ -10,7 +14,7 @@
     @time: 2023.03.21
 */
 
-Game::Game(QObject *parent) : QObject(parent),f("localgames.txt")
+Game::Game(QObject *parent) : QObject(parent)
 {
     //初始化游戏
     memset(Board,0,sizeof(Board));
@@ -18,7 +22,9 @@ Game::Game(QObject *parent) : QObject(parent),f("localgames.txt")
     PlayerBlack=1;
     PlayerWhite=0;
     StepCount=0;
-    game_init();
+                                                                                                online=0;
+
+
     //检测到Timeout信号时，触发一次judgeTime函数。
     connect(Timer, &QTimer::timeout, this, &Game::judgeTime);
     //分出胜负时，展示结果界面
@@ -43,7 +49,6 @@ void Game::ChangePlayer()
 //再来一局
 void Game::resetGame()
 {
-    game_init();
     memset(Board,0,sizeof(Board));
     memset(helper,0,sizeof(helper));
     PlayerBlack=1;
@@ -80,14 +85,6 @@ void Game::setTimeLimit(int Second)
 void Game::judge()
 {
     StepCount++;
-    if(PlayerBlack)
-    {
-        go_write(1,CurrentPositionX,CurrentPositionY,StepCount);
-    }
-    if(PlayerWhite)
-    {
-        go_write(0,CurrentPositionX,CurrentPositionY,StepCount);
-    }
     QString step=QString::number(StepCount,10);
     Timer->stop();
     Timer->start(200);
@@ -98,48 +95,41 @@ void Game::judge()
     if(PlayerWhite) Board[x][y] =-1;
 
     //0表示游戏继续，1表示落棋方吃子而输，2表示落棋方自杀而输
-    switch (LibertyCheck(x,y)) {
-    case 0:
-        ChangePlayer();
-        StartTime=clock();
-        //qDebug() << "case 0 emit";
-        Assistant();
-        break;
+    if(!online) switch (LibertyCheck(x,y)) {
+        case 0:
+            ChangePlayer();
+            StartTime=clock();
+            //qDebug() << "case 0 emit";
+            Assistant();
+            break;
 
-    case 1:
-        if(PlayerBlack)
-        {
-            winner = 0;
-            game_over();
-            emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
+        case 1:
+            if(PlayerBlack) emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
+            if(PlayerWhite) emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
+            //qDebug() << "case 1 emit";
+            break;
+        case 2:
+            if(PlayerBlack) emit ResultDisplaySignal("黑棋方自杀了。  步数：" + step + "\n白棋方赢啦！");
+            if(PlayerWhite) emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
+            //qDebug() << "case 2 emit";
+            break;
+        default:
+            break;
         }
-        if(PlayerWhite)
-        {
-            winner = 1;
-            game_over();
-            emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
-        }
-        //qDebug() << "case 1 emit";
-        break;
-    case 2:
-        if(PlayerBlack)
-        {
-            winner = 5;
-            game_over();
-            emit ResultDisplaySignal("黑棋方自杀了。  步数：" + step + "\n白棋方赢啦！");
-        }
-        if(PlayerWhite)
-        {
-            winner = 4;
-            game_over();
-            emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
-        }
-        //qDebug() << "case 2 emit";
-        break;
-    default:
-        break;
-    }
 
+
+                                                                                                                if(online) switch (LibertyCheck(x,y)) {
+                                                                                                                case 0:
+                                                                                                                    ChangePlayer();
+                                                                                                                    StartTime=clock();
+
+                                                                                                                    Assistant();
+                                                                                                                    break;
+                                                                                                                default:
+                                                                                                                    if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
+                                                                                                                    emit Suicide();
+                                                                                                                    break;
+                                                                                                                }
 
 
 }
@@ -258,21 +248,11 @@ void Game::judgeTime()
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
-    if(clock()-StartTime > TimeLimit*1000)
+    if(!online && clock()-StartTime > TimeLimit*1000)
     {
         Timer->stop();
-        if(PlayerBlack)
-        {
-            winner = 7;
-            game_over();
-            emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
-        }
-        if(PlayerWhite)
-        {
-            winner = 6;
-            game_over();
-            emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
-        }
+        if(PlayerBlack) emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
+        if(PlayerWhite) emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
     }
 
 }
@@ -296,87 +276,5 @@ void Game::Assistant()
         qDebug() << helper[i][1] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][5] << " " << helper[i][6] << " " << helper[i][7] << " " << helper[i][8] << " " << helper[i][9];
     }
     qDebug() <<"----------------------";
-}
-
-void Game::game_init(void)
-{
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
-    {
-        qDebug()<<"打开文件失败";
-    }
-    QTextStream out(&f);
-    QString str = "Game at ";
-    QTime time = QTime::currentTime();
-    out<<'-'<<'\n';
-    out<<str<<time.toString("hh:mm:ss t")<<'\n';
-
-    f.close();
-}
-
-void Game::game_over(void)
-{
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
-    {
-        qDebug()<<"打开文件失败";
-    }
-    QTextStream out(&f);
-    QString str = "game is over";
-    out<<str<<'\n';
-    out<<"The result is below:"<<'\n';
-    out<<"Total time: "<<TotalTime<<' '<<"Total steps: "<<StepCount<<'\n';
-    out<<"Winner: ";
-
-    if(winner == 0)
-    {
-        out<<"Playerwhite"<<'\n';
-    }
-    if(winner == 1)
-    {
-        out<<"Playerblack"<<'\n';
-    }
-    if(winner == 2)
-    {
-        out<<"Playerbalck G"<<'\n';
-    }
-    if(winner == 3)
-    {
-        out<<"Playerwhite G"<<'\n';
-    }
-    if(winner == 4)
-    {
-        out<<"Playerblack S"<<'\n';
-    }
-    if(winner == 5)
-    {
-        out<<"Playerwhite S"<<'\n';
-    }
-    if(winner == 6)
-    {
-        out<<"Playerblack T"<<'\n';
-    }
-    if(winner == 7)
-    {
-        out<<"Playerwhite T"<<'\n';
-    }
-
-    f.close();
-}
-//下每一步棋子的时候同时记录函数，第一个布尔值为当前颜色,黑1，中间xy值是当前落子处坐标，最后一个是当前步数
-void Game::go_write(bool player,int cpx,int cpy,int cstep)
-{
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
-    {
-        qDebug()<<"打开文件失败";
-    }
-    QTextStream out(&f);
-    if(player)
-    {
-        out<<cstep<<": "<<"Playerblack"<<' '<<(char)(cpx+64)<<cpy<<'\n';
-    }
-    else
-    {
-        out<<cstep<<": "<<"Playerwhite"<<' '<<(char)(cpx+64)<<cpy<<'\n';
-    }
-    f.close();
 }
 

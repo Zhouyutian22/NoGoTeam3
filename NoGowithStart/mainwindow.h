@@ -1,11 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "Game.h"
+#include <Game.h>
 #include <QMainWindow>
 #include <QVector>
 #include "gochess.h"
-#include <iostream>
-#include <fstream>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -31,6 +29,11 @@ public:
     QVector<goChess>chesses;    //      动态数组记录落子
     bool current;                   //当前落子颜色
     void setNewGame();            //再来一局的初始化
+
+
+                                                                        bool NetMode;                 //是否是网络游戏
+                                                                        void PutChessOn(int ,int );   //联网下棋
+                                                                        int MyColor;                  //1黑-1白
 public slots:
     void StopGoing();             //游戏结束时停止行棋记录
     void setTimeLimit();          //设置倒计时时长
@@ -43,6 +46,11 @@ signals:
     void GiveupSignal(QString );
     //窗口被关闭时，唤出主窗口
     void ReturnStart();
+
+
+                                                                            //更新棋盘给NetWindow
+                                                                            void Move(int ,int );
+                                                                            void GiveUp();   //认输信号
 private slots:
     void on_pushButton_clicked();
 private:

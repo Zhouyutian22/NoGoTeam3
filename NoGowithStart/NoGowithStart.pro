@@ -17,6 +17,7 @@ SOURCES += \
     networkdata.cpp \
     networkserver.cpp \
     networksocket.cpp \
+    request.cpp \
     resultwidget.cpp \
     startwindow.cpp
 
@@ -28,12 +29,14 @@ HEADERS += \
     networkdata.h \
     networkserver.h \
     networksocket.h \
+    request.h \
     resultwidget.h \
     startwindow.h
 
 FORMS += \
     mainwindow.ui \
     netwindow.ui \
+    request.ui \
     resultwidget.ui \
     startwindow.ui
 

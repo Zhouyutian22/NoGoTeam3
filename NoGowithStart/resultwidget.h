@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QTextBrowser>
-//#include "ui_resultwidget.h"
+#include "ui_resultwidget.h"
 namespace Ui {
 class resultwidget;
 }
