@@ -313,6 +313,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                                                                                         game->CurrentPositionY=y;
                                                                                         //启动判断胜负
                                                                                         emit StartJudge();
+                                                                                        qDebug() << "判断完毕，位置：" << x << " " << y;
                                                                                         DisplayTime(game->TimeLimit);
                                                                                         current = !current;
                                                                                     }

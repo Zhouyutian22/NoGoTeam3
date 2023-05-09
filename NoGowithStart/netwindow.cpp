@@ -149,7 +149,7 @@ void NetWindow::receiveDataFromServer(NetworkData data)
 
     case OPCODE::MOVE_OP:
         CodetoNumber(data.data1);
-
+        break;
     case OPCODE::SUICIDE_END_OP:
         if(SuicideSent)
         {
@@ -181,7 +181,7 @@ void NetWindow::receiveDataFromServer(NetworkData data)
 void NetWindow::reStart()
 {
     qDebug()<<"restart the server.";
-
+    PORT=ui->PORTEdit->text().toInt();
     disconnect(this->server,&NetworkServer::receive,this,&NetWindow::receiveDataFromSocket);
     delete this->server;
     this->server = new NetworkServer(this);
