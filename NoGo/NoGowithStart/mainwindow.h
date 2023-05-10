@@ -51,6 +51,8 @@ signals:
                                                                             //更新棋盘给NetWindow
                                                                             void Move(int ,int );
                                                                             void GiveUp();   //认输信号
+                                                                            //窗口被人为关闭
+                                                                            void CloseByPerson();
 private slots:
     void on_pushButton_clicked();
 private:

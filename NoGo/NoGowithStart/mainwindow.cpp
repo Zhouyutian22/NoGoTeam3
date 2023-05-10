@@ -304,7 +304,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     else if(NetMode)
     {
-
+        emit CloseByPerson();
     }
 }
 

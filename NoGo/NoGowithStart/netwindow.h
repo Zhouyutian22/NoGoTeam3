@@ -37,8 +37,8 @@ public:
     //关闭行为
     void closeEvent(QCloseEvent *event);
     //胜利和失败弹窗
-    void win();
-    void lose();
+    void win(int );
+    void lose(int );
 
     //编码与棋盘转换
     void CodetoNumber(QString code);
@@ -79,18 +79,24 @@ public slots:
     void Suicide();
     //认输结束
     void GiveUp();
+    //超时结束
+    void Timeout();
+    //退出
+    void Left();
 signals:
     //窗口被关闭时，唤出主窗口
     void ReturnStart();
 private:
     //READY处理函数
     void GameRequest(QString ,QString );
-
+    void Leave();
     //是否在对局
     bool onGame;
     //是否已发送投降、自杀信号
     bool SuicideSent;
     bool GiveUpSent;
+    bool TimeoutSent;
+    void init();
     //游戏窗口
     MainWindow * m;
     Ui::NetWindow *ui;

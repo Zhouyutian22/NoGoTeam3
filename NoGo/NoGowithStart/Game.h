@@ -30,8 +30,8 @@ signals:
     void resetGo();
     void exitGo();
     void updateTime(int );
-                                                                                         void Suicide(); //自杀信号
-
+                                                                                        void Suicide(); //自杀信号
+                                                                                        void RivalTimeout(); //超时信号
 //信号槽
 public slots:
     //判断游戏胜负

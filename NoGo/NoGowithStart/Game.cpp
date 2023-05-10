@@ -90,10 +90,10 @@ void Game::judge()
     Timer->start(200);
     int x=CurrentPositionX;
     int y=CurrentPositionY;
-    qDebug() << "judge" << " 1 ";
+
     if(PlayerBlack) Board[x][y] = 1;
     if(PlayerWhite) Board[x][y] =-1;
-    qDebug() << "judge" << " 2 ";
+
     //0表示游戏继续，1表示落棋方吃子而输，2表示落棋方自杀而输
     if(!online) switch (LibertyCheck(x,y)) {
         case 0:
@@ -120,12 +120,12 @@ void Game::judge()
 
                                                                                                                 if(online) switch (LibertyCheck(x,y)) {
                                                                                                                 case 0:
-                                                                                                                    qDebug() << "judge" << " 3 ";
+
                                                                                                                     ChangePlayer();
                                                                                                                     StartTime=clock();
 
-                                                                                                                    Assistant();
-                                                                                                                    qDebug() << "judge" << " 4 ";
+                                                                                                                    if((MyColor == 1 && PlayerBlack) || (MyColor == -1 && PlayerWhite)) Assistant();
+
                                                                                                                     break;
                                                                                                                 default:
                                                                                                                     if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
@@ -250,11 +250,20 @@ void Game::judgeTime()
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
-    if(!online && clock()-StartTime > TimeLimit*1000)
+    if(clock()-StartTime > TimeLimit*1000)
     {
+
         Timer->stop();
-        if(PlayerBlack) emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
-        if(PlayerWhite) emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
+        if(!online)
+        {
+            if(PlayerBlack) emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
+            else emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
+        }
+        //网络游戏
+        else if(online &&((MyColor == 1 && PlayerWhite )||(MyColor == -1 && PlayerBlack)))
+        {
+            emit RivalTimeout();
+        }
     }
 
 }
@@ -272,11 +281,12 @@ void Game::Assistant()
                 Board[i][j]=0;
             }
         }
-    qDebug() << StepCount;
+    /*
+     * qDebug() << StepCount;
     for(int i=1;i<10;i++)
     {
         qDebug() << helper[i][1] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][5] << " " << helper[i][6] << " " << helper[i][7] << " " << helper[i][8] << " " << helper[i][9];
     }
-    qDebug() <<"----------------------";
+    qDebug() <<"----------------------"; */
 }
 
