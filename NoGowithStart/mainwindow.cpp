@@ -50,9 +50,9 @@ void MainWindow::drawboard()
     pencil.setWidth(2);         //宽度为2
 
     painter.setPen(pencil);
-    for(int r=1;r<=ROWS;r++)
+    for(int r=1;r<=(game->road)-1;r++)
     {
-        for(int c=1;c<=COLOMNS;c++)
+        for(int c=1;c<=(game->road)-1;c++)
         {
             painter.drawRect((r+0.5)*WIDTH,(c+0.5)*HEIGHT,WIDTH,HEIGHT);
         }
@@ -105,7 +105,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         int ptx = event->pos().x();
         int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
         //判断点击位置是否在棋盘内
-        if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
+        if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+((game->road)-1)*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+((game->road)-1)*HEIGHT)
         {
             point.setX(ptx/WIDTH);
             point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
@@ -205,17 +205,21 @@ void MainWindow::on_pushButton_clicked()
             QMessageBox::critical(this, "提示", "游戏还没有开始~");
             return;
         }
-        if(Going)
+    if(Going)
+    {
+        if(current==1)
         {
-            if(current==1)
-            {
-                emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
-            }
-            else
-            {
-                emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
-            }
+            game->winner = 3;
+            game->game_over();
+            emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
         }
+        else
+        {
+            game->winner = 2;
+            game->game_over();
+            emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
+        }
+    }
     }
 
                                                                                                         if(NetMode)
@@ -275,8 +279,8 @@ void MainWindow::drawHint()
     QPen pencil(Qt::transparent);
     painter.setPen(pencil);
     painter.setBrush(Qt::red);
-    for(int i=1;i<10;i++)
-        for(int j=1;j<10;j++)
+    for(int i=1;i<=(game->road);i++)
+        for(int j=1;j<=(game->road);j++)
         {
             if(game->helper[i][j] == 1)
             {
@@ -290,7 +294,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(!NetMode)
     {
-        emit ReturnStart();
+        emit ReturnChoose();
         game->closed=true;
         delete this;
     }

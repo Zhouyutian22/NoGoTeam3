@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     Game.cpp \
+    chooseroadwindow.cpp \
     gochess.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -17,25 +18,36 @@ SOURCES += \
     networkdata.cpp \
     networkserver.cpp \
     networksocket.cpp \
+    readrecords.cpp \
+    rego.cpp \
+    regowindow.cpp \
     request.cpp \
     resultwidget.cpp \
     startwindow.cpp
 
 HEADERS += \
     Game.h \
+    chooseroadwindow.h \
     gochess.h \
     mainwindow.h \
     netwindow.h \
     networkdata.h \
     networkserver.h \
     networksocket.h \
+    readrecords.h \
+    rego.h \
+    regowindow.h \
     request.h \
     resultwidget.h \
     startwindow.h
 
 FORMS += \
+    chooseroadwindow.ui \
     mainwindow.ui \
     netwindow.ui \
+    readrecords.ui \
+    rego.ui \
+    regowindow.ui \
     request.ui \
     resultwidget.ui \
     startwindow.ui

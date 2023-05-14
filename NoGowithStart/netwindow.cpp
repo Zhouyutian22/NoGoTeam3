@@ -307,8 +307,7 @@ void NetWindow::Move(int x,int y)
 {
     //编码转换
     char *cd;
-    cd[0]=y+'A'-1;
-    cd[1]=x+'0';
+
 
     QString code=QString(QLatin1String(cd));
 

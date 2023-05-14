@@ -5,6 +5,10 @@
 #include <vector>
 #include <QTimer>
 #include "resultwidget.h"
+#include <QTime>
+#include <QDebug>
+#include <QFile>
+#include <QString>
 /*
     @file Game.h
     @brief  这里定义了Game类，
@@ -43,16 +47,16 @@ public slots:
     //...
     //游戏结果展示
     void ResultDisplay(QString text);
-    //重置游戏
-    void resetGame();
-    //退出游戏
-    void exitGame();
+        //重置游戏
+        void resetGame();
+        //退出游戏
+        void exitGame();
 //一些游戏信息
 public:
     //时间信号
     QTimer* Timer=new QTimer(this);
     //当前棋盘局面**
-    int Board[10][10];
+    int Board[14][14];
     //黑白玩家
     int PlayerBlack;
     int PlayerWhite;
@@ -70,7 +74,7 @@ public:
     //不可下棋处的探测
     void Assistant();
     //不可下棋处
-    int helper[10][10];
+    int helper[14][14];
     //判断窗口是否被关闭
     bool closed;
     //游戏总时长
@@ -78,20 +82,41 @@ public:
 
                                                                         bool online;
                                                                         int MyColor;
+                                                                        /*
+     *  游戏胜者
+     *  0 白方正常赢
+     *  1 黑方正常赢
+     *  2 白方认输，黑方赢
+     *  3 黑方认输，白方赢
+     *  4 白方自杀，黑方赢
+     *  5 黑方自杀，白方赢
+     *  6 白方超时，黑方赢
+     *  7 黑方超时，白方赢
+     */
+    int winner;
+    //行棋中记录
+    void go_write(bool,int,int,int);
+    //对局开始时记录
+    void game_init(void);
+    //对局结束时记录
+    void game_over(void);
+    //本地游戏路数
+    int road;
 private:
-
+    //文件记录棋谱以便复盘
+    QFile f;
     //更改下棋方
     void ChangePlayer();
-    //判断是否提子的函数
-    int LibertyCheck(int ,int );
-    //判断是否提子的函数
-    void dfs(int ,int ,int );
-    //判断该点是否在棋盘内
-    bool InBoard(int ,int );
-    //判断该点四周是否有子
-    bool NeedCheck(int ,int );
-    //辅助的变量
-    int checked[10][10];
+        //判断是否提子的函数
+        int LibertyCheck(int ,int );
+        //判断是否提子的函数
+        void dfs(int ,int ,int );
+        //判断该点是否在棋盘内
+        bool InBoard(int ,int );
+        //判断该点四周是否有子
+        bool NeedCheck(int ,int );
+        //辅助的变量
+        int checked[14][14];
     //辅助的变量
     int DirectionX[4]={0,1,0,-1};
     int DirectionY[4]={-1,0,1,0};

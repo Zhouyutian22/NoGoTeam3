@@ -5,6 +5,8 @@
 #include <QVector>
 #include "mainwindow.h"
 #include "netwindow.h"
+#include "regowindow.h"
+#include "chooseroadwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class StartWindow; }
@@ -17,7 +19,7 @@ class StartWindow : public QMainWindow
 signals:
 
 public slots:
-    void SingleGame();
+    //void SingleGame();
     void NetGame();
 public:
 
@@ -25,6 +27,11 @@ public:
     ~StartWindow();
 
 
+
+private slots:
+    void on_RecordPattern_clicked();
+
+    void on_SingleGame_clicked();
 
 private:
     Ui::StartWindow *ui;

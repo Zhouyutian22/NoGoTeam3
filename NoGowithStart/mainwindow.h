@@ -30,7 +30,6 @@ public:
     bool current;                   //当前落子颜色
     void setNewGame();            //再来一局的初始化
 
-
                                                                         bool NetMode;                 //是否是网络游戏
                                                                         void PutChessOn(int ,int );   //联网下棋
                                                                         int MyColor;                  //1黑-1白
@@ -44,8 +43,8 @@ signals:
     void StartJudge();
     //主动认输
     void GiveupSignal(QString );
-    //窗口被关闭时，唤出主窗口
-    void ReturnStart();
+    //窗口被关闭时，唤出选择路数窗口
+    void ReturnChoose();
 
 
                                                                             //更新棋盘给NetWindow
