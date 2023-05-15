@@ -33,6 +33,7 @@ public:
                                                                         bool NetMode;                 //是否是网络游戏
                                                                         void PutChessOn(int ,int );   //联网下棋
                                                                         int MyColor;                  //1黑-1白
+                                                                        void setName(QString ,QString );
 public slots:
     void StopGoing();             //游戏结束时停止行棋记录
     void setTimeLimit();          //设置倒计时时长
@@ -50,6 +51,8 @@ signals:
                                                                             //更新棋盘给NetWindow
                                                                             void Move(int ,int );
                                                                             void GiveUp();   //认输信号
+                                                                            //窗口被人为关闭
+                                                                            void CloseByPerson();
 private slots:
     void on_pushButton_clicked();
 private:

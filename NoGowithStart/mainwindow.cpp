@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("不围棋");
-    resize(16.99*WIDTH,10.5*HEIGHT);        //窗口大小
+    //resize(16.99*WIDTH,10.5*HEIGHT);        //窗口大小
     current = 1;            //执黑先行
     Going=true;             //正在下棋
     chesses.clear();        //清空落子记录
@@ -165,6 +165,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
                                                                         //向对手传递落子位置
                                                                         emit Move(game->CurrentPositionX,game->CurrentPositionY);
                                                                         //启动判断胜负
+                                                                        drawchess();
                                                                         emit StartJudge();
                                                                         DisplayTime(game->TimeLimit);
                                                                         current = !current;
@@ -224,6 +225,7 @@ void MainWindow::on_pushButton_clicked()
 
                                                                                                         if(NetMode)
                                                                                                         {
+                                                                                                            if((MyColor == 1 && current) || (MyColor == -1 && !current))
                                                                                                             emit GiveUp();
                                                                                                         }
 }
@@ -300,7 +302,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     else if(NetMode)
     {
-
+        emit CloseByPerson();
     }
 }
 
@@ -317,7 +319,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
                                                                                         game->CurrentPositionY=y;
                                                                                         //启动判断胜负
                                                                                         emit StartJudge();
-                                                                                        qDebug() << "判断完毕，位置：" << x << " " << y;
+                                                                                        qDebug() << "对方落子，判断完毕，位置：" << x << " " << y;
                                                                                         DisplayTime(game->TimeLimit);
                                                                                         current = !current;
+                                                                                    }
+
+                                                                                    void MainWindow::setName(QString a,QString b)
+                                                                                    {
+                                                                                        ui->BlackName->setText("黑棋："+ a);
+                                                                                        ui->WhiteName->setText("白棋："+ b);
                                                                                     }

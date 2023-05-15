@@ -151,7 +151,7 @@ void Game::judge()
                                                                                                                     ChangePlayer();
                                                                                                                     StartTime=clock();
 
-                                                                                                                    Assistant();
+                                                                                                                    if((MyColor == 1 && PlayerBlack) || (MyColor == -1 && PlayerWhite)) Assistant();
                                                                                                                     break;
                                                                                                                 default:
                                                                                                                     if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
@@ -276,20 +276,27 @@ void Game::judgeTime()
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
-    if(!online && clock()-StartTime > TimeLimit*1000)
+    if(clock()-StartTime > TimeLimit*1000)
     {
         Timer->stop();
-        if(PlayerBlack)
+        if(!online)
         {
-            winner = 7;
-            game_over();
-            emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
+            if(PlayerBlack)
+            {
+                winner = 7;
+                game_over();
+                emit ResultDisplaySignal("黑棋方超时了……\n白棋方赢啦！！！");
+            }
+            if(PlayerWhite)
+            {
+                winner = 6;
+                game_over();
+                emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
+            }
         }
-        if(PlayerWhite)
+        else if(online &&((MyColor == 1 && PlayerWhite )||(MyColor == -1 && PlayerBlack)))
         {
-            winner = 6;
-            game_over();
-            emit ResultDisplaySignal("白棋方超时了……\n黑棋方赢啦！！！");
+            emit RivalTimeout();
         }
     }
 
