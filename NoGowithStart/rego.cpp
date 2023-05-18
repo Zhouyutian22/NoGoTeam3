@@ -7,7 +7,7 @@ namespace {
     int initsum = 0;
 }
 ReGo::ReGo(QWidget *parent) :
-    QMainWindow(parent),sum(::initsum),color(true),ptx(0),pty(0),cnt(0),step(0),go(1),
+    QMainWindow(parent),sum(::initsum),ptx(0),pty(0),cnt(0),step(0),
     ui(new Ui::ReGo)
 {
     ui->setupUi(this);
@@ -27,8 +27,11 @@ void ReGo::closeEvent(QCloseEvent *e)
 
 void ReGo::on_pushButton_clicked()
 {
-    //go = 1;
-    //repaint();
+    if(step<cnt)
+        step++;
+    else
+        step = cnt;
+    update();
 }
 
 void ReGo::drawboard()
@@ -53,7 +56,7 @@ void ReGo::drawchess()
     QPainter painter(this);
     QPen pencil(Qt::transparent);
     painter.setPen(pencil);
-
+    bool color = 1;
     for(int t = 0;t < step;t++)
     {
         if(!color)
@@ -66,9 +69,7 @@ void ReGo::drawchess()
 
         color = !color;
     }
-    step++;
-    qDebug()<<step;
-    go = 0;
+    //qDebug()<<step;
 }
 
 void ReGo::rego_init()
@@ -85,10 +86,12 @@ void ReGo::rego_init()
             if(readstr==0)
             {
                 qDebug()<<"No games saved!";
+                emit ReturnRego();
             }
             else if(readstr == -1)
             {
                 qDebug()<<"error in reading";
+                emit ReturnRego();
             }
             else;
 
@@ -106,6 +109,7 @@ void ReGo::rego_init()
         else
         {
             qDebug()<<"open fail";
+            emit ReturnRego();
         }
 
         if(f.open(QIODevice::ReadOnly))
@@ -132,16 +136,46 @@ void ReGo::rego_init()
             readstr = f.readLine(str,::maxsize);
             while(str[0]!='g')
             {
-                ptx = (int)(str[15]-64);
-                if(str[17]=='\n')
-                    pty = (int)(str[16]-48);
-                else
-                    pty = (int)(str[16]-48)*10+(int)(str[17]-48);
-                board[cnt][0] = ptx;
-                board[cnt][1] = pty;
-                cnt++;
-                //qDebug()<<ptx<<' '<<pty;
-                readstr = f.readLine(str,::maxsize);
+                if(str[1]==':')
+                {
+                    ptx = (int)(str[15]-64);
+                    if(str[17]=='\n')
+                        pty = (int)(str[16]-48);
+                    else
+                        pty = (int)(str[16]-48)*10+(int)(str[17]-48);
+                    board[cnt][0] = ptx;
+                    board[cnt][1] = pty;
+                    cnt++;
+                    //qDebug()<<ptx<<' '<<pty;
+                    readstr = f.readLine(str,::maxsize);
+                }
+                else if(str[2]==':')
+                {
+                    ptx = (int)(str[16]-64);
+                    if(str[18]=='\n')
+                        pty = (int)(str[17]-48);
+                    else
+                        pty = (int)(str[17]-48)*10+(int)(str[18]-48);
+                    board[cnt][0] = ptx;
+                    board[cnt][1] = pty;
+                    cnt++;
+                    //qDebug()<<ptx<<' '<<pty;
+                    readstr = f.readLine(str,::maxsize);
+                }
+                else if(str[3]==':')
+                {
+                    ptx = (int)(str[17]-64);
+                    if(str[17]=='\n')
+                        pty = (int)(str[18]-48);
+                    else
+                        pty = (int)(str[18]-48)*10+(int)(str[19]-48);
+                    board[cnt][0] = ptx;
+                    board[cnt][1] = pty;
+                    cnt++;
+                    //qDebug()<<ptx<<' '<<pty;
+                    readstr = f.readLine(str,::maxsize);
+                }
+                else;
             }
             while(str[0]!='W')
             {
@@ -161,39 +195,28 @@ void ReGo::rego_init()
         else
         {
             qDebug()<<"open fail";
+            emit ReturnRego();
         }
     }
     else
     {
         qDebug()<<"file does not exist";
+        emit ReturnRego();
     }
 }
 
 void ReGo::paintEvent(QPaintEvent *)
 {
-        if(step<=cnt)
-        {
-            drawboard();
-            drawchess();
-            update();
-        }
-        else
-        {
-            drawboard();
-            QPainter painter(this);
-            QPen pencil(Qt::transparent);
-            painter.setPen(pencil);
-            bool c = 1;
-            for(int t = 0;t<cnt;t++)
-            {
-                if(!c)
-                    painter.setBrush(Qt::white);
-                else
-                    painter.setBrush(Qt::black);
-                QPoint center((board[t][0]+0.5)*WIDTH,(board[t][1]+0.5)*HEIGHT);
-                painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
-
-                c = !c;
-            }
-        }
+    drawboard();
+    drawchess();
 }
+
+void ReGo::on_pushButton_2_clicked()
+{
+    if(step>0)
+        step--;
+    else
+        step = 0;
+    update();
+}
+

@@ -29,8 +29,6 @@ public:
     void drawboard();
     //画棋子
     void drawchess();
-    //当前颜色
-    bool color;
     //画具
     void paintEvent(QPaintEvent *);
     //棋子坐标
@@ -43,8 +41,6 @@ public:
     int cnt;
     //当前进行的步数
     int step;
-    //进行
-    bool go;
     //胜者
     bool winner;
 signals:
@@ -52,6 +48,8 @@ signals:
     void Redraw();
 private slots:
     void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+
 private:
     Ui::ReGo *ui;
 };

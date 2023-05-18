@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>复盘</string>
+     <string>前进</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -43,14 +43,27 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>119</y>
+      <x>400</x>
+      <y>120</y>
       <width>311</width>
       <height>91</height>
      </rect>
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>100</y>
+      <width>92</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>后退</string>
     </property>
    </widget>
   </widget>
