@@ -12,7 +12,7 @@
 #define WIDTH 30
 #define HEIGHT   30       //棋盘格长宽
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),flag(1)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -175,10 +175,44 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 //绘制棋盘和棋子的动作
 void MainWindow::paintEvent(QPaintEvent *)
 {
+    if(game->recmode == 1)
+    {
         drawboard();
         drawchess();
         drawHint();
         update();
+    }
+    else
+    {
+        if(flag)
+        {
+            QPainter painter(this);
+            QPen pencil(Qt::transparent);
+            painter.setPen(pencil);
+            bool color = 1;
+            for(int t = 0;t < chesses.size();t++)
+            {
+                                                                            if(!color)
+                                                                                painter.setBrush(Qt::white);
+                                                                            else
+                                                                                painter.setBrush(Qt::black);
+
+                                                                            QPoint center((chesses[t].c_point.x()+0.5)*WIDTH,(chesses[t].c_point.y()+0.5)*HEIGHT);
+                                                                            painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
+
+                                                                            color = !color;
+            }
+            update();
+            flag = 0;
+        }
+        else
+        {
+            drawboard();
+            drawchess();
+            drawHint();
+            update();
+        }
+    }
 }
 //停止下棋，使得绘制棋子、逻辑判断停止
 void MainWindow::StopGoing()

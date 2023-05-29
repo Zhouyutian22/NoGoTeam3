@@ -34,6 +34,8 @@ public:
                                                                         void PutChessOn(int ,int );   //联网下棋
                                                                         int MyColor;                  //1黑-1白
                                                                         void setName(QString ,QString );
+                                                                        //只画一次
+                                                                        bool flag;
 public slots:
     void StopGoing();             //游戏结束时停止行棋记录
     void setTimeLimit();          //设置倒计时时长

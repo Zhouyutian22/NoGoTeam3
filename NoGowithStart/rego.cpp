@@ -7,12 +7,18 @@ namespace {
     int initsum = 0;
 }
 ReGo::ReGo(QWidget *parent) :
-    QMainWindow(parent),sum(::initsum),ptx(0),pty(0),cnt(0),step(0),
+    QMainWindow(parent),sum(::initsum),ptx(0),pty(0),cnt(0),step(0),show_modeon(false),flag(0),move(0),
     ui(new Ui::ReGo)
 {
     ui->setupUi(this);
     rego_init();
+    timer.setInterval(1000);
+    connect(&timer,&QTimer::timeout,this,&ReGo::continueshow);
     ui->label->setText("复盘");
+    ui->lineEdit->setPlaceholderText("plz enter the step");
+    QRegularExpression rx("[0-9/.]+$");
+    QRegularExpressionValidator *val = new QRegularExpressionValidator(rx,this);
+    ui->lineEdit->setValidator(val);
 }
 
 ReGo::~ReGo()
@@ -27,11 +33,16 @@ void ReGo::closeEvent(QCloseEvent *e)
 
 void ReGo::on_pushButton_clicked()
 {
-    if(step<cnt)
-        step++;
-    else
-        step = cnt;
     update();
+    if(flag)
+    {
+        if(step<cnt)
+            step++;
+        else
+            step = cnt;
+    }
+    else
+        flag = 1;
 }
 
 void ReGo::drawboard()
@@ -207,16 +218,133 @@ void ReGo::rego_init()
 
 void ReGo::paintEvent(QPaintEvent *)
 {
-    drawboard();
-    drawchess();
+    if(!show_modeon)
+    {
+        if(move)
+        {
+            if(to_which_step>=0&&to_which_step<=cnt)
+            {
+                step = to_which_step;
+                update();
+                    move = 0;
+            }
+            else
+            {
+                QWidget *w = new QWidget;
+                QLabel *l = new QLabel(w);
+
+                l->setText("步数错误！");
+                move = 0;
+                w->show();
+            }
+        }
+        else
+        {
+            drawboard();
+            drawchess();
+        }
+    }
+    else
+    {
+        if(move)
+        {
+            if(to_which_step>=0&&to_which_step<=cnt)
+            {
+                step = to_which_step;
+                update();
+                move = 0;
+            }
+            else
+            {
+                QWidget *w = new QWidget;
+                QLabel *l = new QLabel(w);
+
+                l->setText("步数错误！");
+                move = 0;
+                w->show();
+            }
+        }
+        else
+        {
+            drawboard();
+            drawchess();
+            stopshow();
+            timer.start();
+            if(step<cnt)
+                step++;
+            else;
+        }
+    }
 }
 
 void ReGo::on_pushButton_2_clicked()
 {
-    if(step>0)
-        step--;
-    else
-        step = 0;
+        if(step>0)
+            step--;
+        else
+            step = 0;
+        update();
+}
+
+
+void ReGo::on_pushButton_3_clicked()
+{
+    show_modeon = true;
+}
+
+
+void ReGo::on_pushButton_4_clicked()
+{
+    timer.stop();
+    show_modeon = false;
+}
+
+void ReGo::stopshow()
+{
+    show_modeon = false;
+    flag = 0;
+}
+
+void ReGo::continueshow()
+{
+    show_modeon = true;
     update();
 }
+
+void ReGo::on_lineEdit_editingFinished()
+{
+    ;//no use
+}
+
+
+
+void ReGo::on_lineEdit_returnPressed()
+{
+    QString str = ui->lineEdit->text();
+    to_which_step = str.toInt();
+    move = 1;
+}
+
+
+void ReGo::on_pushButton_5_clicked()
+{
+    MainWindow *m=new MainWindow;
+    m->game->closed=0;
+    m->game->recmode = 0;
+    m->game->road = road;
+    bool col = 1;
+    step--;
+    for(int i = 0;i<step;i++)
+    {
+            QPoint point;
+            point.setX(board[i][0]);
+            point.setY(board[i][1]);
+            goChess chess(point,col);
+            m->chesses.append(chess);
+            col = !col;
+    }
+    m->current = col;
+    m->show();
+}
+
 

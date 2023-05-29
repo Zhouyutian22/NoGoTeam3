@@ -9,6 +9,9 @@
 #include <QPaintEvent>
 #include <QTime>
 #include <QTextEdit>
+#include <QTimer>
+#include <QRegularExpressionValidator>
+#include "mainwindow.h"
 namespace Ui {
 class ReGo;
 }
@@ -43,12 +46,37 @@ public:
     int step;
     //胜者
     bool winner;
+    //播放模式开启
+    bool show_modeon;
+    //计时器
+    QTimer timer;
+    //判断变量
+    bool flag;
+    //到某步
+    int to_which_step;
+    void stopshow();
+    //局面转移变量
+    bool move;
 signals:
     void ReturnRego();
     void Redraw();
+
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+    void continueshow();
+
+    void on_lineEdit_editingFinished();
+
+    void on_lineEdit_returnPressed();
+    void on_pushButton_5_clicked();
+
+public slots:
+    //void del();
 
 private:
     Ui::ReGo *ui;

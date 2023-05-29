@@ -79,6 +79,8 @@ public:
     bool closed;
     //游戏总时长
     int TotalTime;
+    //是否要记录对局
+    bool recmode;
 
                                                                         bool online;
                                                                         int MyColor;
@@ -122,7 +124,6 @@ private:
     int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
-
 
 };
 

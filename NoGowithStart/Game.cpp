@@ -23,6 +23,7 @@ Game::Game(QObject *parent) : QObject(parent),f("mygames.txt")
     PlayerBlack=1;
     PlayerWhite=0;
     StepCount=0;
+    recmode = 1;//默认记录本局游戏
                                                                                                 online=0;
 
 
@@ -325,83 +326,92 @@ void Game::Assistant()
 
 void Game::game_init(void)
 {
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+    if(recmode)
     {
-        qDebug()<<"打开文件失败";
-    }
-    QTextStream out(&f);
-    QString str = "Game at ";
-    QDateTime time = QDateTime::currentDateTime();
-    out<<'-'<<road<<'\n';
-    out<<str<<time.toString("yyyy-MM-dd hh:mm:ss ddd")<<'\n';
+        if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+        {
+            qDebug()<<"打开文件失败";
+        }
+        QTextStream out(&f);
+        QString str = "Game at ";
+        QDateTime time = QDateTime::currentDateTime();
+        out<<'-'<<road<<'\n';
+        out<<str<<time.toString("yyyy-MM-dd hh:mm:ss ddd")<<'\n';
 
-    f.close();
+        f.close();
+    }
 }
 
 void Game::game_over(void)
 {
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+    if(recmode)
     {
-        qDebug()<<"打开文件失败";
-    }
-    QTextStream out(&f);
-    QString str = "game is over";
-    out<<str<<'\n';
-    out<<"The result is below:"<<'\n';
-    out<<"Total time: "<<TotalTime<<' '<<"Total steps: "<<StepCount<<'\n';
-    out<<"Winner: ";
+        if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+        {
+            qDebug()<<"打开文件失败";
+        }
+        QTextStream out(&f);
+        QString str = "game is over";
+        out<<str<<'\n';
+        out<<"The result is below:"<<'\n';
+        out<<"Total time: "<<TotalTime<<' '<<"Total steps: "<<StepCount<<'\n';
+        out<<"Winner: ";
 
-    if(winner == 0)
-    {
-        out<<"Playerwhite"<<'\n';
-    }
-    if(winner == 1)
-    {
-        out<<"Playerblack"<<'\n';
-    }
-    if(winner == 2)
-    {
-        out<<"Playerbalck G"<<'\n';
-    }
-    if(winner == 3)
-    {
-        out<<"Playerwhite G"<<'\n';
-    }
-    if(winner == 4)
-    {
-        out<<"Playerblack S"<<'\n';
-    }
-    if(winner == 5)
-    {
-        out<<"Playerwhite S"<<'\n';
-    }
-    if(winner == 6)
-    {
-        out<<"Playerblack T"<<'\n';
-    }
-    if(winner == 7)
-    {
-        out<<"Playerwhite T"<<'\n';
-    }
+        if(winner == 0)
+        {
+            out<<"Playerwhite"<<'\n';
+        }
+        if(winner == 1)
+        {
+            out<<"Playerblack"<<'\n';
+        }
+        if(winner == 2)
+        {
+            out<<"Playerbalck G"<<'\n';
+        }
+        if(winner == 3)
+        {
+            out<<"Playerwhite G"<<'\n';
+        }
+        if(winner == 4)
+        {
+            out<<"Playerblack S"<<'\n';
+        }
+        if(winner == 5)
+        {
+            out<<"Playerwhite S"<<'\n';
+        }
+        if(winner == 6)
+        {
+            out<<"Playerblack T"<<'\n';
+        }
+        if(winner == 7)
+        {
+            out<<"Playerwhite T"<<'\n';
+        }
 
-    f.close();
+        f.close();
+    }
 }
 //下每一步棋子的时候同时记录函数，第一个布尔值为当前颜色,黑1，中间xy值是当前落子处坐标，最后一个是当前步数
 void Game::go_write(bool player,int cpx,int cpy,int cstep)
 {
-    if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+    if(recmode)
     {
-        qDebug()<<"打开文件失败";
+        if(!f.open(QIODevice::ReadWrite | QIODevice::Append))
+        {
+            qDebug()<<"打开文件失败";
+        }
+        QTextStream out(&f);
+        if(player)
+        {
+            out<<cstep<<": "<<"Playerblack"<<' '<<(char)(cpx+64)<<cpy<<'\n';
+        }
+        else
+        {
+            out<<cstep<<": "<<"Playerwhite"<<' '<<(char)(cpx+64)<<cpy<<'\n';
+        }
+        f.close();
     }
-    QTextStream out(&f);
-    if(player)
-    {
-        out<<cstep<<": "<<"Playerblack"<<' '<<(char)(cpx+64)<<cpy<<'\n';
-    }
-    else
-    {
-        out<<cstep<<": "<<"Playerwhite"<<' '<<(char)(cpx+64)<<cpy<<'\n';
-    }
-    f.close();
 }
 
