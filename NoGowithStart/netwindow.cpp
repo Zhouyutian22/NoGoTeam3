@@ -21,6 +21,12 @@ NetWindow::NetWindow(QWidget *parent) :
     MyColor=-1;         //初始化为白棋，体现谦让之风
     ServerorSocket=0;
     ConnectedOne=nullptr;
+    //列表邀请的内容
+    rt=new RequestList();
+    Requestcnt=0;
+    connect(rt,&RequestList::Acc,this,&NetWindow::AcceptOne);
+    connect(rt,&RequestList::Rej,this,&NetWindow::RejectOne);
+    //
     init();
     this->ui->IPEdit->setText(IP);
     this->ui->PORTEdit->setText(QString::number(PORT));
@@ -64,12 +70,13 @@ NetWindow::~NetWindow()
 //服务端的信息处理函数
 void NetWindow::receiveDataFromSocket(QTcpSocket* client, NetworkData data)
 {
-    //仅连接一台机器
-    if(ConnectedOne == nullptr)
+    //仅连接一台机器(暂时作废)
+    /*if(ConnectedOne == nullptr)
     {
         ui->StatusLabel->setText("Connected as Server with"+client->peerAddress().toString());
     }
-    else if(onGame && ConnectedOne!=client)
+    else */
+    if(onGame && ConnectedOne!=client)
     {
         this->server->send(client,NetworkData(OPCODE::CHAT_OP,"对不起，正在与另一台机器进行对局",NULL));
     }
@@ -133,6 +140,7 @@ void NetWindow::receiveDataFromSocket(QTcpSocket* client, NetworkData data)
         }
         break;
     case OPCODE::LEAVE_OP:
+        if(ConnectedOne != client) break;
         ui->StatusLabel->setText(HisName+" Left");
         QMessageBox::information(this,"离开信息","对方离开了");
         Leave();
@@ -322,11 +330,13 @@ void NetWindow::GameRequest(QString Name,QString Color)
         MyColor=1;
     }
     ServerorSocket=1;
-    Request *r=new Request(Name,RequestColor);
-    connect(r,&Request::Ac,this,&NetWindow::StartGame);
-    connect(r,&Request::Re,this,&NetWindow::RejectGame);
-    r->show();
+    //对局申请的数据其实就是姓名、颜色和IP
+    RequestData r{Name,RequestColor,ConnectedOne};
 
+    rt->PutIn(r);
+    if(Requestcnt == 0) rt->show();
+    Requestcnt++;
+    qDebug() <<"request++";
 }
 
 //同意对局后开启游戏
@@ -351,13 +361,13 @@ void NetWindow::StartGame()
     else m->setName(HisName,MyName+"(我)");
     m->MyColor=m->game->MyColor=MyColor;
     m->game->online=true;
+    m->BotButtonHide();
     m->show();
 
 }
 
 void NetWindow::Move(int x,int y)
 {
-    qDebug() << "move " << "1";
     //编码转换
     char *cd=new char[3];
     cd[0]=y+'A'-1;
@@ -496,7 +506,8 @@ void NetWindow::lose(int code)
         default:
             break;
         }
-
+        //停表
+        m->game->Timer->stop();
         init();
         switch(ServerorSocket)
         {
@@ -555,6 +566,33 @@ void NetWindow::Left()
     }
 
     Leave();
+}
+
+void NetWindow::AcceptOne(QString name,QString color,QTcpSocket * soc)
+{
+    HisName=name;
+
+    if(color == "黑")
+        MyColor=-1;
+    else if(color == "白")
+        MyColor=1;
+
+    ConnectedOne=soc;
+    Requestcnt--;
+    qDebug()<<"ac -Re cnt ==" << Requestcnt;
+    if(Requestcnt == 0) rt->hide();
+    StartGame();
+
+}
+
+void NetWindow::RejectOne(QString reason,QTcpSocket * soc)
+{
+    ConnectedOne=soc;
+    Requestcnt--;
+    qDebug()<<"rej -Re cnt ==" << Requestcnt;
+    if(Requestcnt == 0) rt->hide();
+    RejectGame(reason);
+    ServerorSocket=1;
 }
 //关闭本窗口的事件
 void NetWindow::closeEvent(QCloseEvent *event)

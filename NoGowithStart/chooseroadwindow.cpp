@@ -6,6 +6,7 @@ ChooseRoadWindow::ChooseRoadWindow(QWidget *parent) :
     ui(new Ui::ChooseRoadWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("不围棋");
 }
 
 ChooseRoadWindow::~ChooseRoadWindow()

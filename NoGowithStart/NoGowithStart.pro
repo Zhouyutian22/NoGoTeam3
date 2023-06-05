@@ -22,6 +22,7 @@ SOURCES += \
     rego.cpp \
     regowindow.cpp \
     request.cpp \
+    requestlist.cpp \
     resultwidget.cpp \
     startwindow.cpp
 
@@ -38,6 +39,7 @@ HEADERS += \
     rego.h \
     regowindow.h \
     request.h \
+    requestlist.h \
     resultwidget.h \
     startwindow.h
 
@@ -49,6 +51,7 @@ FORMS += \
     rego.ui \
     regowindow.ui \
     request.ui \
+    requestlist.ui \
     resultwidget.ui \
     startwindow.ui
 

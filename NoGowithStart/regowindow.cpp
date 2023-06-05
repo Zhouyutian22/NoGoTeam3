@@ -8,6 +8,7 @@ RegoWindow::RegoWindow(QWidget *parent) :
     ui(new Ui::RegoWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("复盘模式");
 }
 
 RegoWindow::~RegoWindow()

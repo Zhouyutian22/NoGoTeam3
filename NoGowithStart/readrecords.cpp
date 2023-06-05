@@ -6,6 +6,7 @@ Readrecords::Readrecords(QWidget *parent) :
     ui(new Ui::Readrecords)
 {
     ui->setupUi(this);
+    setWindowTitle("行棋记录");
 }
 
 Readrecords::~Readrecords()

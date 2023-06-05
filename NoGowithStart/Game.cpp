@@ -23,16 +23,19 @@ Game::Game(QObject *parent) : QObject(parent),f("mygames.txt")
     PlayerBlack=1;
     PlayerWhite=0;
     StepCount=0;
+    closed=0;
     recmode = 1;//默认记录本局游戏
-                                                                                                online=0;
-
-
+    online=0;   //默认为非联网游戏
     //检测到Timeout信号时，触发一次judgeTime函数。
     connect(Timer, &QTimer::timeout, this, &Game::judgeTime);
 
     //分出胜负时，展示结果界面
     connect(this,&Game::ResultDisplaySignal,this,&Game::ResultDisplay);
 
+
+    //AI相关
+    BlackBot=0;
+    WhiteBot=0;
 }
 
 //切换下棋者
@@ -128,7 +131,6 @@ void Game::judge()
             game_over();
             emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
         }
-        //qDebug() << "case 1 emit";
         break;
     case 2:
         if(PlayerBlack)
@@ -143,24 +145,20 @@ void Game::judge()
             game_over();
             emit ResultDisplaySignal("白棋方自杀了。  步数：" + step + "\n黑棋方赢啦！");
         }
-        //qDebug() << "case 2 emit";
         break;
     }
+    if(online) switch (LibertyCheck(x,y)) {
+    case 0:
+        ChangePlayer();
+        StartTime=clock();
 
-                                                                                                                if(online) switch (LibertyCheck(x,y)) {
-                                                                                                                case 0:
-                                                                                                                    ChangePlayer();
-                                                                                                                    StartTime=clock();
-
-                                                                                                                    if((MyColor == 1 && PlayerBlack) || (MyColor == -1 && PlayerWhite)) Assistant();
-                                                                                                                    break;
-                                                                                                                default:
-                                                                                                                    if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
-                                                                                                                    emit Suicide();
-                                                                                                                    break;
-                                                                                                                }
-
-
+        if((MyColor == 1 && PlayerBlack) || (MyColor == -1 && PlayerWhite)) Assistant();
+        break;
+    default:
+        if((Game::MyColor == 1 && PlayerWhite == 1)||(Game::MyColor == -1 && PlayerBlack == 1))
+            emit Suicide();
+        break;
+    }
 }
 //judge函数的辅助函数来判断是否围住了邻近对手棋子的气。
 int Game::LibertyCheck(int x,int y)
@@ -274,6 +272,13 @@ void Game::judgeTime()
 {
     //关闭窗口时不再计时
     if(closed) Timer->stop();
+
+    if(((PlayerBlack && BlackBot) || (PlayerWhite && WhiteBot)) && clock()-StartTime > TimeLimit*100)
+    {
+        qDebug() << "AIGo";
+        AIGo();
+        return;
+    }
     //超时情况
     //qDebug() << "judgeTime " << (int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)) ;
     emit updateTime((int)(0.001*(-1*clock()+StartTime+TimeLimit*1000)));
@@ -316,12 +321,162 @@ void Game::Assistant()
                 Board[i][j]=0;
             }
         }
-    qDebug() << StepCount;
-    for(int i=1;i<=road;i++)
-    {
-        qDebug() << helper[i][1] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][2] << " " << helper[i][5] << " " << helper[i][6] << " " << helper[i][7] << " " << helper[i][8] << " " << helper[i][9];
+    qDebug() << "TotalStep: " << StepCount;
+
+}
+
+//AI落子函数
+void Game::AIGo()
+{
+    bool GG=0;
+    if(PlayerBlack) {
+        greedy(1);
+        if(AIPosx != 0 && AIPosy != 0)
+        {
+            emit AIPosition(AIPosx,AIPosy);
+            PlayerBlack=0;
+            PlayerWhite=1;
+        }
+        else GG=1;
     }
-    qDebug() <<"----------------------";
+    else if(PlayerWhite) {
+        greedy(-1);
+        if(AIPosx != 0 && AIPosy != 0)
+        {
+            emit AIPosition(AIPosx,AIPosy);
+            PlayerBlack=1;
+            PlayerWhite=0;
+        }
+        else GG=1;
+    }
+
+    //判断能否下棋
+
+
+    if(GG)
+    {
+        if(!online)
+        {
+            QString step=QString::number(StepCount,10);
+            if(PlayerBlack)
+            {
+                winner = 0;
+                game_over();
+                emit ResultDisplaySignal("白棋方赢啦！    步数："+step);
+            }
+            if(PlayerWhite)
+            {
+                winner = 1;
+                game_over();
+                emit ResultDisplaySignal("黑棋方赢啦！    步数："+step);
+            }
+        }
+        else if(online)
+        {
+            game_over();
+            emit AIGiveup();
+            //停掉定时器
+            Timer->stop();
+            emit StopGo();
+        }
+    }
+
+}
+
+
+//color可落子判断
+int Game::colorcheck(int x,int y,int color)
+{
+    int MyColor=PlayerBlack?1:-1;
+    if(MyColor == color)
+    {
+        if(LibertyCheck(x,y))   return 0;
+        else return 1;
+    }
+    else
+    {
+        ChangePlayer();
+        if(LibertyCheck(x,y))  {ChangePlayer(); return 0;}
+        else {ChangePlayer();return 1;}
+
+    }
+}
+
+//估值函数，对当前局面进行评估，计算颜色为color的一方比另一方可落子的位置数目多多少（权利值比较）
+int Game::evaluate(int color)
+{
+    int right = 0;
+    int op_color = (-1)*color;
+    for (int x = 1; x <= road; x++)
+    {
+        for (int y = 1; y <= road; y++)
+        {
+            if (colorcheck(x, y, color))
+                right++;
+            if (colorcheck(x, y, op_color))
+                right--;
+        }
+    }
+    return right;
+}
+
+//贪心算法
+void Game::greedy(int color)
+{
+    int max_value = INT_MIN;
+    int best_i[170] = {0}, best_j[170] = {0}, best_num = 0;
+    for (int i = 1; i <= road; i++)
+    {
+        for (int j = 1; j <= road; j++)
+        {
+            if (Game::colorcheck(i,j,color) && Board[i][j] == 0 && helper[i][j] == 0)
+            {
+                int temp=Board[i][j];
+                Board[i][j] = color;
+                value[i][j] =evaluate(color);
+                if (value[i][j] > max_value)
+                    max_value = value[i][j];
+                Board[i][j] = temp;
+            }
+            else
+                value[i][j] = INT_MIN;
+        }
+
+    }
+    for (int i = 1; i <= road; i++)
+        for (int j = 1; j <= road; j++)
+            if (value[i][j] == max_value)
+            {
+                best_i[best_num] = i;
+                best_j[best_num] = j;
+                best_num++;
+            }
+
+    int random = rand() % best_num; //在所有最大value里面随机选
+    int i,j;
+    bool AbletoGo=0;
+    for(i=1;i<=road;i++)
+    {
+        for(j=1;j<=road;j++)
+        {
+            if(Board[i][j] == 0 && helper[i][j] == 0)
+            {
+                AbletoGo=1;
+                break;
+            }
+        }
+        if(AbletoGo == 1) break;
+    }
+    if(AbletoGo)
+    {
+        AIPosx=best_i[random];
+        AIPosy=best_j[random];
+    }
+    else if(!AbletoGo)
+    {
+        AIPosx=AIPosy=0;
+    }
+
 }
 
 void Game::game_init(void)
@@ -414,4 +569,3 @@ void Game::go_write(bool player,int cpx,int cpy,int cstep)
         f.close();
     }
 }
-

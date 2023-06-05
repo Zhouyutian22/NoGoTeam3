@@ -12,6 +12,7 @@ ReGo::ReGo(QWidget *parent) :
 {
     ui->setupUi(this);
     rego_init();
+    setWindowTitle("复盘模式");
     timer.setInterval(1000);
     connect(&timer,&QTimer::timeout,this,&ReGo::continueshow);
     ui->label->setText("复盘");
@@ -346,5 +347,3 @@ void ReGo::on_pushButton_5_clicked()
     m->current = col;
     m->show();
 }
-
-

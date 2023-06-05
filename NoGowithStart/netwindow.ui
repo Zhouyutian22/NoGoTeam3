@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
+    <width>560</width>
     <height>347</height>
    </rect>
   </property>
@@ -197,7 +197,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>585</width>
+     <width>560</width>
      <height>26</height>
     </rect>
    </property>
