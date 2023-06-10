@@ -62,6 +62,7 @@ signals:
     void Redraw();
 
 private slots:
+    //窗口各个控件
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
 
@@ -75,6 +76,7 @@ private slots:
     void on_lineEdit_returnPressed();
     void on_pushButton_5_clicked();
 
+    //废案
 public slots:
     //void del();
 

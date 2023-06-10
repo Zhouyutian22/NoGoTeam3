@@ -12,7 +12,7 @@
 #define WIDTH 30
 #define HEIGHT   30       //棋盘格长宽
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),flag(1)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -37,21 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->setTimeButton,&QPushButton::clicked,this,&MainWindow::setTimeLimit);
     //更新时间展示的信号
     connect(game,&Game::updateTime,this,&MainWindow::DisplayTime);
-
-
-    //AI相关
-    connect(game,&Game::AIPosition,this,&MainWindow::AIPutIn);
-    connect(game,&Game::AIGiveup,this,&MainWindow::on_pushButton_clicked);
-    connect(ui->BlackBot,&QCheckBox::clicked,this,[&](){
-        qDebug()<< "changemodeb";
-        if(ui->BlackBot->isChecked()) game->BlackBot=1;
-        else game->BlackBot=0;
-    });
-    connect(ui->WhiteBot,&QCheckBox::clicked,this,[&](){
-        qDebug()<< "changemodew";
-        if(ui->WhiteBot->isChecked()) game->WhiteBot=1;
-        else game->WhiteBot=0;
-    });
 }
 MainWindow::~MainWindow()
 {
@@ -114,7 +99,7 @@ void MainWindow::drawchess()
 //鼠标点击落子
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if(Going && !NetMode && ((current == 1 && game->BlackBot == 0) ||(current == 0 && game->WhiteBot == 0))) //如果棋局在进行
+    if(Going && !NetMode) //如果棋局在进行
     {
         QPoint point;
         int ptx = event->pos().x();
@@ -147,45 +132,45 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         current = !current;
 
     }
-    else if(NetMode && game->BlackBot == 0 && game->WhiteBot == 0) //联网模式的手动下棋
-    {
-        if((MyColor == 1 && current == 1) || (MyColor == -1 && current == 0))
-        {
-            QPoint point;
-            int ptx = event->pos().x();
-            int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
-            //判断点击位置是否在棋盘内
-            if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
-            {
-                point.setX(ptx/WIDTH);
-                point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
-            }
-            else
-            {
-                return ;
-            }
-            for(int i=0;i<chesses.size();i++)
-            {
-                goChess m = chesses[i];
-                if(m.c_point == point)
-                    return ;
-            }
-            //当前落子处不能已经有子
-            goChess present(point,current);
-            chesses.append(present);
+                                                            else if(NetMode) //复制过来的
+                                                            {
+                                                                if((MyColor == 1 && current == 1) || (MyColor == -1 && current == 0))
+                                                                {
+                                                                        QPoint point;
+                                                                        int ptx = event->pos().x();
+                                                                        int pty = event->pos().y();  //找到鼠标点击点的x，y坐标
+                                                                        //判断点击位置是否在棋盘内
+                                                                        if(ptx >= 1.5*WIDTH && ptx <= 1.5*WIDTH+COLOMNS*WIDTH && pty >= 1.5*HEIGHT && pty <= 1.5*HEIGHT+ROWS*HEIGHT)
+                                                                        {
+                                                                            point.setX(ptx/WIDTH);
+                                                                            point.setY(pty/HEIGHT);     //设置点的坐标为点击处的网格点
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            return ;
+                                                                        }
+                                                                        for(int i=0;i<chesses.size();i++)
+                                                                        {
+                                                                            goChess m = chesses[i];
+                                                                            if(m.c_point == point)
+                                                                                return ;
+                                                                        }
+                                                                        //当前落子处不能已经有子
+                                                                        goChess present(point,current);
+                                                                        chesses.append(present);
 
-            //向game类传递落子位置
-            game->CurrentPositionX=ptx/WIDTH;
-            game->CurrentPositionY=pty/HEIGHT;
-            //向对手传递落子位置
-            emit Move(game->CurrentPositionX,game->CurrentPositionY);
-            //启动判断胜负
-            drawchess();
-            emit StartJudge();
-            DisplayTime(game->TimeLimit);
-            current = !current;
-        }
-    }
+                                                                        //向game类传递落子位置
+                                                                        game->CurrentPositionX=ptx/WIDTH;
+                                                                        game->CurrentPositionY=pty/HEIGHT;
+                                                                        //向对手传递落子位置
+                                                                        emit Move(game->CurrentPositionX,game->CurrentPositionY);
+                                                                        //启动判断胜负
+                                                                        drawchess();
+                                                                        emit StartJudge();
+                                                                        DisplayTime(game->TimeLimit);
+                                                                        current = !current;
+                                                                }
+                                                            }
 }
 //绘制棋盘和棋子的动作
 void MainWindow::paintEvent(QPaintEvent *)
@@ -207,15 +192,15 @@ void MainWindow::paintEvent(QPaintEvent *)
             bool color = 1;
             for(int t = 0;t < chesses.size();t++)
             {
-                if(!color)
-                    painter.setBrush(Qt::white);
-                else
-                    painter.setBrush(Qt::black);
+                                                                            if(!color)
+                                                                                painter.setBrush(Qt::white);
+                                                                            else
+                                                                                painter.setBrush(Qt::black);
 
-                QPoint center((chesses[t].c_point.x()+0.5)*WIDTH,(chesses[t].c_point.y()+0.5)*HEIGHT);
-                painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
+                                                                            QPoint center((chesses[t].c_point.x()+0.5)*WIDTH,(chesses[t].c_point.y()+0.5)*HEIGHT);
+                                                                            painter.drawEllipse(center,WIDTH/2,HEIGHT/2);
 
-                color = !color;
+                                                                            color = !color;
             }
             update();
             flag = 0;
@@ -255,32 +240,28 @@ void MainWindow::on_pushButton_clicked()
             QMessageBox::critical(this, "提示", "游戏还没有开始~");
             return;
         }
-        if(Going)
+    if(Going)
+    {
+        if(current==1)
         {
-            if(current==1)
-            {
-                if(game->BlackBot == 1) return;
-                game->winner = 3;
-                game->game_over();
-                emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
-            }
-            else
-            {
-                if(game->WhiteBot == 1) return;
-                game->winner = 2;
-                game->game_over();
-                emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
-            }
+            game->winner = 3;
+            game->game_over();
+            emit GiveupSignal("黑棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n白棋方赢啦！！！");
+        }
+        else
+        {
+            game->winner = 2;
+            game->game_over();
+            emit GiveupSignal("白棋方认输。   步数：" +QString::number(game->StepCount,10) +"\n黑棋方赢啦！！！");
         }
     }
-
-    if(NetMode)
-    {
-        qDebug() << "AI触发投降";
-        if((MyColor == 1 && current) || (MyColor == -1 && !current))
-            emit GiveUp();
-        game->closed=1;
     }
+
+                                                                                                        if(NetMode)
+                                                                                                        {
+                                                                                                            if((MyColor == 1 && current) || (MyColor == -1 && !current))
+                                                                                                            emit GiveUp();
+                                                                                                        }
 }
 //更新倒计时
 void MainWindow::DisplayTime(int Time)
@@ -324,6 +305,7 @@ void MainWindow::setTimeLimit()
         ui->setTimeLimit->append(QString::number(game->TimeLimit,10));
         QMessageBox::critical(this, "提示", "输入无效");
     }
+
 }
 
 //禁止落子提示
@@ -358,64 +340,26 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void MainWindow::PutChessOn(int x,int y)
-{
-    QPoint point;
-    point.setX(x);
-    point.setY(y);
+                                                                                    void MainWindow::PutChessOn(int x,int y)
+                                                                                    {
+                                                                                        QPoint point;
+                                                                                        point.setX(x);
+                                                                                        point.setY(y);
 
-    goChess present(point,current);
-    chesses.append(present);
-    //向game类传递落子位置
-    game->CurrentPositionX=x;
-    game->CurrentPositionY=y;
-    //启动判断胜负
-    emit StartJudge();
-    qDebug() << "对方落子，判断完毕，位置：" << x << " " << y;
-    DisplayTime(game->TimeLimit);
-    current = !current;
-}
+                                                                                        goChess present(point,current);
+                                                                                        chesses.append(present);
+                                                                                        //向game类传递落子位置
+                                                                                        game->CurrentPositionX=x;
+                                                                                        game->CurrentPositionY=y;
+                                                                                        //启动判断胜负
+                                                                                        emit StartJudge();
+                                                                                        qDebug() << "对方落子，判断完毕，位置：" << x << " " << y;
+                                                                                        DisplayTime(game->TimeLimit);
+                                                                                        current = !current;
+                                                                                    }
 
-void MainWindow::setName(QString a,QString b)
-{
-    ui->BlackName->setText("黑棋："+ a);
-    ui->WhiteName->setText("白棋："+ b);
-}
-
-void MainWindow::AIPutIn(int x,int y)
-{
-    QPoint point;
-    point.setX(x);
-    point.setY(y);
-
-    goChess present(point,current);
-    chesses.append(present);
-    //向game类传递落子位置
-    game->CurrentPositionX=x;
-    game->CurrentPositionY=y;
-    if(Going && !NetMode)
-    {
-        emit StartJudge();
-        qDebug() << "AI落子，判断完毕，位置：" << x << " " << y;
-
-    }
-    else if(NetMode)
-    {
-
-        //向对手传递落子位置
-        emit Move(game->CurrentPositionX,game->CurrentPositionY);
-        qDebug() << "AI落子，判断完毕，位置：" << x << " " << y;
-        drawchess();
-        //启动判断胜负
-        emit StartJudge();
-
-    }
-    DisplayTime(game->TimeLimit);
-    current = !current;
-}
-
-void MainWindow::BotButtonHide()
-{
-    if(MyColor == 1)        ui->WhiteBot->hide();
-    else if(MyColor == -1)  ui->BlackBot->hide();
-}
+                                                                                    void MainWindow::setName(QString a,QString b)
+                                                                                    {
+                                                                                        ui->BlackName->setText("黑棋："+ a);
+                                                                                        ui->WhiteName->setText("白棋："+ b);
+                                                                                    }

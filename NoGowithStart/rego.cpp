@@ -12,12 +12,11 @@ ReGo::ReGo(QWidget *parent) :
 {
     ui->setupUi(this);
     rego_init();
-    setWindowTitle("复盘模式");
     timer.setInterval(1000);
-    connect(&timer,&QTimer::timeout,this,&ReGo::continueshow);
-    ui->label->setText("复盘");
+    connect(&timer,&QTimer::timeout,this,&ReGo::continueshow);      //播放棋局时的延时功能，用的一个计时器，记时时暂停，这是计时结束时结束暂停继续播放的槽
+    //ui->label->setText("复盘");
     ui->lineEdit->setPlaceholderText("plz enter the step");
-    QRegularExpression rx("[0-9/.]+$");
+    QRegularExpression rx("[0-9/.]+$");         //正则表达式，设置lineEdit里面只能输入正整数，不能输入其他字符
     QRegularExpressionValidator *val = new QRegularExpressionValidator(rx,this);
     ui->lineEdit->setValidator(val);
 }
@@ -27,12 +26,12 @@ ReGo::~ReGo()
     delete ui;
 }
 
-void ReGo::closeEvent(QCloseEvent *e)
+void ReGo::closeEvent(QCloseEvent *e)   //关闭本窗口时发出返回上级窗口的信号
 {
     emit ReturnRego();
 }
 
-void ReGo::on_pushButton_clicked()
+void ReGo::on_pushButton_clicked()          //点击播放，播放函数，update方法更新局面
 {
     update();
     if(flag)
@@ -84,9 +83,9 @@ void ReGo::drawchess()
     //qDebug()<<step;
 }
 
-void ReGo::rego_init()
+void ReGo::rego_init()              //初始化
 {
-    QString path = QFileDialog::getOpenFileName(this,"open","mygames","TXT(*.txt)");
+    QString path = QFileDialog::getOpenFileName(this,"open","mygames","TXT(*.txt)");        //打开并阅读文件，从中得到上一局对局记录
     if(!path.isEmpty())
     {
         QFile f(path);
@@ -145,7 +144,7 @@ void ReGo::rego_init()
 
             qDebug()<<road<<' '<<sum;
             //getchar();
-            readstr = f.readLine(str,::maxsize);
+            readstr = f.readLine(str,::maxsize);        //按行来读，根据储存的格式，找到记录棋子位置的信息，读取并转化为int值储存在静态二维数组中
             while(str[0]!='g')
             {
                 if(str[1]==':')
@@ -327,12 +326,12 @@ void ReGo::on_lineEdit_returnPressed()
 }
 
 
-void ReGo::on_pushButton_5_clicked()
+void ReGo::on_pushButton_5_clicked()        //重新开始下棋函数，本质上是重开了一个游戏窗口，但提前预置了此步以前的局面
 {
     MainWindow *m=new MainWindow;
     m->game->closed=0;
     m->game->recmode = 0;
-    m->game->road = road;
+    m->game->road = road;                   //这里可以写成继承
     bool col = 1;
     step--;
     for(int i = 0;i<step;i++)
@@ -347,3 +346,5 @@ void ReGo::on_pushButton_5_clicked()
     m->current = col;
     m->show();
 }
+
+

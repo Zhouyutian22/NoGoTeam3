@@ -7,7 +7,7 @@ StartWindow::StartWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("开始界面");
-    //单机游戏
+    //单机游戏PVP
     //connect(ui->SingleGame,&QPushButton::clicked,this,&StartWindow::SingleGame);
     connect(ui->NetGame,&QPushButton::clicked,this,&StartWindow::NetGame);
 

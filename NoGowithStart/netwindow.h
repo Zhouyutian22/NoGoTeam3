@@ -6,7 +6,7 @@
 #include "networkserver.h"
 #include "networksocket.h"
 #include "mainwindow.h"
-#include "requestlist.h"
+
 namespace Ui {
 class NetWindow;
 }
@@ -83,11 +83,6 @@ public slots:
     void Timeout();
     //退出
     void Left();
-
-
-    //列表邀请相关的信号槽
-    void AcceptOne(QString,QString,QTcpSocket *);
-    void RejectOne(QString,QTcpSocket *);
 signals:
     //窗口被关闭时，唤出主窗口
     void ReturnStart();
@@ -102,9 +97,6 @@ private:
     bool GiveUpSent;
     bool TimeoutSent;
     void init();
-    //请求列表窗口
-    RequestList * rt;
-    int Requestcnt;
     //游戏窗口
     MainWindow * m;
     Ui::NetWindow *ui;

@@ -12,7 +12,6 @@ Request::Request(QString name,QString color):
     QDialog(),
     ui(new Ui::Request)
 {
-
     ui->setupUi(this);
     ui->PlayerInformation->append(" " + name+ " 想要执" + color +"棋与你对弈。");
     connect(ui->YesButton,&QPushButton::clicked,this,&Request::accpet);
