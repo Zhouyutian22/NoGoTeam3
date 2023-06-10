@@ -1,4 +1,3 @@
-//过渡窗口，写了一些按钮罢了
 #include "regowindow.h"
 #include "ui_regowindow.h"
 #include "readrecords.h"
@@ -9,6 +8,7 @@ RegoWindow::RegoWindow(QWidget *parent) :
     ui(new Ui::RegoWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("复盘模式");
 }
 
 RegoWindow::~RegoWindow()

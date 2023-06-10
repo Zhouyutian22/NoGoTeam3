@@ -7,6 +7,7 @@ RequestList::RequestList(QWidget *parent) :
     ui(new Ui::RequestList)
 {
     ui->setupUi(this);
+    setWindowTitle("新申请列表");
     init();
 }
 

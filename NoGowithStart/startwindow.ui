@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>450</height>
+    <width>464</width>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="SingleGame">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>80</y>
+      <x>110</x>
+      <y>70</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -31,14 +31,14 @@
      </font>
     </property>
     <property name="text">
-     <string> 单机游戏（PVP）</string>
+     <string>单机游戏</string>
     </property>
    </widget>
    <widget class="QPushButton" name="NetGame">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>130</y>
+      <x>110</x>
+      <y>120</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -51,14 +51,14 @@
      </font>
     </property>
     <property name="text">
-     <string> 联网游戏（PVP）</string>
+     <string>联网游戏</string>
     </property>
    </widget>
    <widget class="QPushButton" name="RecordPattern">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>180</y>
+      <x>110</x>
+      <y>170</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -80,7 +80,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>644</width>
+     <width>464</width>
      <height>26</height>
     </rect>
    </property>

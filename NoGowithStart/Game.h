@@ -34,8 +34,12 @@ signals:
     void resetGo();
     void exitGo();
     void updateTime(int );
-                                                                                        void Suicide(); //自杀信号
-                                                                                        void RivalTimeout(); //超时信号
+    //网络信号
+    void Suicide(); //自杀信号
+    void RivalTimeout(); //超时信号
+    //AI信号
+    void AIPosition(int ,int );
+    void AIGiveup();
 //信号槽
 public slots:
     //判断游戏胜负
@@ -51,6 +55,9 @@ public slots:
         void resetGame();
         //退出游戏
         void exitGame();
+
+        //AI相关的函数
+
 //一些游戏信息
 public:
     //时间信号
@@ -79,12 +86,13 @@ public:
     bool closed;
     //游戏总时长
     int TotalTime;
+    int BeginTime;
     //是否要记录对局
     bool recmode;
-
-                                                                        bool online;
-                                                                        int MyColor;
-                                                                        /*
+    //联网判断
+    bool online;
+    int MyColor;
+    /*
      *  游戏胜者
      *  0 白方正常赢
      *  1 黑方正常赢
@@ -104,6 +112,18 @@ public:
     void game_over(void);
     //本地游戏路数
     int road;
+
+
+    //AI相关的函数等
+    void AIGo();
+    int AIPosx;
+    int AIPosy;
+    bool BlackBot;
+    bool WhiteBot;
+    int colorcheck(int ,int ,int);
+    int evaluate(int );
+    void greedy(int color);
+    int value[14][14];
 private:
     //文件记录棋谱以便复盘
     QFile f;
@@ -124,6 +144,7 @@ private:
     int DirectionY[4]={-1,0,1,0};
     //辅助的变量
     int flag;
+
 
 };
 

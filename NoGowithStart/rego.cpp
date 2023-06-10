@@ -331,7 +331,7 @@ void ReGo::on_pushButton_5_clicked()        //重新开始下棋函数，本质�
     MainWindow *m=new MainWindow;
     m->game->closed=0;
     m->game->recmode = 0;
-    m->game->road = road;                   //这里可以写成继承
+    m->game->road = road;
     bool col = 1;
     step--;
     for(int i = 0;i<step;i++)

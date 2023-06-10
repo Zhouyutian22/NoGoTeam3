@@ -7,8 +7,7 @@ StartWindow::StartWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("开始界面");
-    //单机游戏PVP
-    //connect(ui->SingleGame,&QPushButton::clicked,this,&StartWindow::SingleGame);
+
     connect(ui->NetGame,&QPushButton::clicked,this,&StartWindow::NetGame);
 
 }
@@ -18,17 +17,8 @@ StartWindow::~StartWindow()
     delete ui;
 }
 
-/*void StartWindow::SingleGame()
-{
-    this->hide();
-    MainWindow *m=new MainWindow;
-    m->game->closed=0;
-    m->show();
 
-    connect(m,&MainWindow::ReturnStart,this,&StartWindow::show);
-}*/
-
-
+//创建新的联机游戏
 void StartWindow::NetGame()
 {
     this->hide();
@@ -39,7 +29,7 @@ void StartWindow::NetGame()
 
 }
 
-
+//创建新的复盘模式
 void StartWindow::on_RecordPattern_clicked()
 {
     this->hide();
@@ -49,7 +39,7 @@ void StartWindow::on_RecordPattern_clicked()
     connect(r,&RegoWindow::ReturnStart,this,&StartWindow::show);
 }
 
-
+//创建新的单机游戏
 void StartWindow::on_SingleGame_clicked()
 {
     this->hide();
